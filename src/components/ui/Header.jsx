@@ -1,4 +1,4 @@
-import logo from "../assets/imagenes/Escudo_de_Nuevo_Chimbote.png";
+import logo from "../../assets/imagenes/Escudo_de_Nuevo_Chimbote.png";
 
 const Header = ({ title }) => {
   return (
