@@ -13,14 +13,14 @@ const FormPageUbicacion = () => {
     const [address, setAddress] = useState("");
 
     return (
-        <div className="min-h-screen bg-gray-50 flex justify-center items-start pt-8">
+        <div className="min-h-screen bg-gray-50 flex justify-center items-start px-2 pb-2 pt-3">
             {/* PARA DARLE TAMAÑO AL PANEL */}
             <div className="w-[900px] min-h-[550px] bg-white rounded-lg shadow-lg overflow-hidden">
                 <Header title="Trámite de Licencia" />
                 <ProgressSteps steps={steps} currentStep={currentStep} />
 
                 {/* CONTENIDO PRINCIPAL */}
-                <div className="px-16 py-8">
+                <div className="px-16 py-2">
                     <h2 className="text-center text-xl sm:text-2xl font-bold">Croquis de la ubicación</h2>
                     <p className="text-center text-gray-600 mb-6">Selecciona la ubicación del establecimiento</p>
 
