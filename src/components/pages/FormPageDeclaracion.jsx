@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/ui/Header";
-import Button from "../components/ui/Button";
-import ProgressSteps from "../components/ui/ProgressSteps";
+import Header from "../ui/Header";
+import Button from "../ui/Button";
+import ProgressSteps from "../ui/ProgressSteps";
 
 const FormPageDeclaracion = () => {
   const navigate = useNavigate();

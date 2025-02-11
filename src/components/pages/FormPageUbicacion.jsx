@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/ui/Header";
-import Button from "../components/ui/Button";
-import ProgressSteps from "../components/ui/ProgressSteps";
-import GoogleMapComponent from "../components/ui/GoogleMapComponent";
+import Header from "../ui/Header";
+import Button from "../ui/Button";
+import ProgressSteps from "../ui/ProgressSteps";
+import GoogleMapComponent from "../ui/GoogleMapComponent";
 
 const FormPageUbicacion = () => {
     const navigate = useNavigate();

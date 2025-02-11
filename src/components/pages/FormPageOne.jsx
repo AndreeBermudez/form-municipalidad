@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/ui/Header";
-import ProgressSteps from "../components/ui/ProgressSteps";
+import Header from "../ui/Header";
+import ProgressSteps from "../ui/ProgressSteps";
 import indeterminadaImg from "../assets/imagenes/inderteminada.jpg";
 import temporalImg from "../assets/imagenes/reloj-tiempo.jpg";
 
