@@ -68,15 +68,7 @@ const FormPageDeclaracion = () => {
 						</div>
 					</div>
 
-					{/* Observaciones */}
-					<div className='mt-6'>
-						<label className='block text-gray-700 font-medium mb-2'>
-							Observaciones o comentarios del solicitante:
-						</label>
-						<textarea
-							className='w-full border rounded-lg p-3 h-20 resize-none'
-							placeholder='Ingrese sus comentarios aquí...'></textarea>
-					</div>
+					
 
 					{/* Navegación */}
 					<div className='flex justify-between mt-8'>

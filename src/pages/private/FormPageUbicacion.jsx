@@ -30,10 +30,11 @@ const FormPageUbicacion = () => {
 					</div>
 
 					{/* Dirección seleccionada */}
-					<div className='mt-4'>
+					<div className='mt-4 hidden'>
 						<label className='font-medium text-gray-700 block'>📍 Dirección Seleccionada</label>
 						<input type='text' className='w-full border rounded-lg p-2 mt-1' value={address} readOnly />
 					</div>
+
 
 					{/* Área total solicitada */}
 					<div className='mt-4'>

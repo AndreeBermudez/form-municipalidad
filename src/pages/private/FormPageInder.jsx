@@ -22,17 +22,8 @@ const FormPageInder = () => {
 					<div className='grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-2'>
 						<div className='sm:col-span-3'>
 							<label className='block text-gray-700 font-medium text-sm sm:text-base'>
-								Apellidos y Nombres / Razón Social
+								N° RUC
 							</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese su nombre o razón social'
-							/>
-						</div>
-
-						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>N° RUC</label>
 							<input
 								type='text'
 								className='w-full border rounded-lg p-2 text-sm sm:text-base'
@@ -41,12 +32,30 @@ const FormPageInder = () => {
 						</div>
 
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>N° DNI / N° CE</label>
+							<label className='block text-gray-700 font-medium text-sm sm:text-base'>Nombre</label>
 							<input
 								type='text'
 								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese su DNI o CE'
+								placeholder='Ingrese su nombre'
 							/>
+						</div>
+
+						<div>
+						<label className='block text-gray-700 font-medium text-sm sm:text-base '>
+								N° DNI / CE
+							</label>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="DNI">DNI</option>
+									<option value="CE">CE</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese numero'
+								/>
+							</div>
 						</div>
 
 						<div>
@@ -79,23 +88,44 @@ const FormPageInder = () => {
 						</div>
 
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>
+							<label className='block text-gray-700 font-medium text-sm sm:text-base '>
 								Av. / Jr. / Ca. / Pje. / Otros
 							</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese su avenida o calle'
-							/>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="Av.">Av.</option>
+									<option value="Jr.">Jr.</option>
+									<option value="Ca.">Ca.</option>
+									<option value="Pje.">Pje.</option>
+									<option value="Otros">Otros</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese su dirección'
+								/>
+							</div>
 						</div>
 
+
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>Urb. / AA.HH. / Otros</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese su urbanización'
-							/>
+							<label className='block text-gray-700 font-medium text-sm sm:text-base '>
+								Urb. / AAHH. / Otros
+							</label>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="Urb.">Urb.</option>
+									<option value="AAHH.">AAHH.</option>
+									<option value="Otro.">Otro.</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese su dirección'
+								/>
+							</div>
 						</div>
 
 						<div>

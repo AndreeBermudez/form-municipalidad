@@ -29,12 +29,21 @@ const FormPageRepresentante = () => {
 						</div>
 
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>N° DNI / N° CE</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese DNI o CE'
-							/>
+						<label className='block text-gray-700 font-medium text-sm sm:text-base '>
+								N° DNI / CE
+							</label>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="DNI">DNI</option>
+									<option value="CE">CE</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese numero'
+								/>
+							</div>
 						</div>
 
 						<div>

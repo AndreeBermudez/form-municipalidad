@@ -47,9 +47,11 @@ const FormPageEstablecimiento = () => {
 
 						<div>
 							<label className='block text-gray-700 font-medium text-sm sm:text-base'>Actividad</label>
-							<select className='w-full border rounded-lg p-2 text-sm sm:text-base'>
-								<option>Seleccione la actividad</option>
-							</select>
+							<input
+								type='text'
+								className='w-full border rounded-lg p-2 text-sm sm:text-base'
+								placeholder='Ingrese su actividad'
+							/>
 						</div>
 
 						<div>
@@ -57,7 +59,7 @@ const FormPageEstablecimiento = () => {
 							<input
 								type='text'
 								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='(Llenado automático o no considerarlo)'
+								placeholder='(Llenado automático)'
 								disabled
 							/>
 						</div>
@@ -67,14 +69,24 @@ const FormPageEstablecimiento = () => {
 					<h3 className='text-blue-600 font-semibold mt-2'>Dirección</h3>
 					<div className='grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-2'>
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>
-								Av./Jr./Ca./Pje./Otros
+						<label className='block text-gray-700 font-medium text-sm sm:text-base '>
+								Av. / Jr. / Ca. / Pje. / Otros
 							</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese la dirección'
-							/>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="Av.">Av.</option>
+									<option value="Jr.">Jr.</option>
+									<option value="Ca.">Ca.</option>
+									<option value="Pje.">Pje.</option>
+									<option value="Otros">Otros</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese su dirección'
+								/>
+							</div>
 						</div>
 
 						<div>
@@ -87,14 +99,22 @@ const FormPageEstablecimiento = () => {
 						</div>
 
 						<div>
-							<label className='block text-gray-700 font-medium text-sm sm:text-base'>
-								Urb./ AA.HH/ Otros (*)
+						<label className='block text-gray-700 font-medium text-sm sm:text-base '>
+								Urb. / AAHH. / Otros
 							</label>
-							<input
-								type='text'
-								className='w-full border rounded-lg p-2 text-sm sm:text-base'
-								placeholder='Ingrese la urbanización'
-							/>
+							<div className="flex ">
+								<select className="border rounded-l-lg rounded-r-none text-sm sm:text-base px-1 py-1 w-12">
+									<option value=""> ↓ </option>
+									<option value="Urb.">Urb.</option>
+									<option value="AAHH.">AAHH.</option>
+									<option value="Otro.">Otro.</option>
+								</select>
+								<input
+									type='text'
+									className='flex-1 border rounded-lg p-2 text-sm sm:text-base  rounded-l-none rounded-r-lg'
+									placeholder='Ingrese su dirección'
+								/>
+							</div>
 						</div>
 					</div>
 
