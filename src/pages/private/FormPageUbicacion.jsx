@@ -1,60 +1,226 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  MobileStepper
+} from '@mui/material';
 import Header from '../../components/ui/Header';
-import Button from '../../components/ui/Button';
 import ProgressSteps from '../../components/ui/ProgressSteps';
-import GoogleMapComponent from '../../components/ui/GoogleMapComponent';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
 
 const FormPageUbicacion = () => {
-	const navigate = useNavigate();
-	const steps = ['Modalidad', 'Solicitante', 'Representante', 'Establecimiento', 'Ubicación', 'Declaración'];
-	const currentStep = 5;
+  const navigate = useNavigate();
+  const steps = ['Modalidad', 'Solicitante', 'Representante', 'Establecimiento', 'Ubicación', 'Declaración'];
+  const currentStep = 5;
 
-	const [address, setAddress] = useState('');
+  const [address, setAddress] = useState('');
 
-	return (
-		<div className='min-h-screen bg-gray-50 flex justify-center items-start px-2 pb-2 pt-3'>
-			{/* PARA DARLE TAMAÑO AL PANEL */}
-			<div className='w-[900px] min-h-[550px] bg-white rounded-lg shadow-lg overflow-hidden'>
-				<Header title='Trámite de Licencia' />
-				<ProgressSteps steps={steps} currentStep={currentStep} />
+  const position = [-9.085594, -78.578593]
 
-				{/* CONTENIDO PRINCIPAL */}
-				<div className='px-16 py-2'>
-					<h2 className='text-center text-xl sm:text-2xl font-bold'>Croquis de la ubicación</h2>
-					<p className='text-center text-gray-600 mb-6'>Selecciona la ubicación del establecimiento</p>
+  const handleBack = () => {
+    navigate('/formulario/pag-establecimiento');
+  };
 
-					{/* Mapa */}
-					<div className='border rounded-lg overflow-hidden shadow-md'>
-						<GoogleMapComponent setAddress={setAddress} />
-					</div>
+  const handleNext = () => {
+    navigate('/formulario/pag-declaracion');
+  };
 
-					{/* Dirección seleccionada */}
-					<div className='mt-4 hidden'>
-						<label className='font-medium text-gray-700 block'>📍 Dirección Seleccionada</label>
-						<input type='text' className='w-full border rounded-lg p-2 mt-1' value={address} readOnly />
-					</div>
+  return (
+    <Box sx={styles.root}>
+      <Header title='Trámite de Licencia' />
+      <Box sx={styles.mainContainer}>
 
+        <Grid container spacing={4} justifyContent="center">
+          {/* ProgressSteps vertical solo en desktop */}
+          <Grid item xs={12} md={2.5} sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Box sx={styles.stepperContainer}>
+              <ProgressSteps 
+                steps={steps} 
+                currentStep={currentStep}
+                onBack={handleBack}
+                onNext={handleNext}
+              />
+            </Box>
+          </Grid>
 
-					{/* Área total solicitada */}
-					<div className='mt-4'>
-						<label className='block font-medium text-gray-700'>Área total solicitada (m²)</label>
-						<input
-							type='number'
-							className='w-full border rounded-lg p-2'
-							placeholder='Ingrese el área total en m²'
-						/>
-					</div>
+          
+          <Grid item xs={12} md={7}>
+            <Paper sx={styles.paper}>
+              <Typography variant="h5" sx={styles.title}>
+                Croquis de la ubicación
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={styles.subtitle}>
+                Selecciona la ubicación del establecimiento
+              </Typography>
 
-					{/* Navegación */}
-					<div className='flex justify-between mt-8'>
-						<Button label='Anterior' variant='secondary' onClick={() => navigate('/formulario/pag-establecimiento')} />
-						<Button label='Siguiente' variant='primary' onClick={() => navigate('/formulario/pag-declaracion')} />
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+              {/* Mapa */}
+              <MapContainer 
+                center={position} 
+                zoom={15} 
+                style={styles.mapContainer}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+              </MapContainer>
+
+              {/* Dirección seleccionada */}
+              <Box sx={{ display: 'none', mt: 4 }}>
+                <Typography variant="subtitle1" sx={styles.label}>
+                  📍 Dirección Seleccionada
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={address}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  variant="outlined"
+                />
+              </Box>
+
+              {/* Área total solicitada */}
+              <Box sx={styles.areaContainer}>
+                <Typography variant="subtitle1" sx={styles.label}>
+                  Área total solicitada (m²)
+                </Typography>
+                <TextField
+                  fullWidth
+                  type="number"
+                  placeholder="Ingrese el área total en m²"
+                  variant="outlined"
+                />
+              </Box>
+
+              {/* Navegación */}
+              <Box sx={styles.navigationContainer}>
+                <Button
+                  variant="outlined"
+                  onClick={handleBack}
+                  startIcon={<ArrowBack />}
+                >
+                  Anterior
+                </Button>
+
+                {/* Mostrar MobileStepper solo en móvil */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <MobileStepper
+                    variant="dots"
+                    steps={steps.length}
+                    position="static"
+                    activeStep={currentStep - 1}
+                    sx={{
+                      backgroundColor: 'transparent',
+                      width: 'auto',
+                      px: 2,
+                      '& .MuiMobileStepper-dots': {
+                        mt: 0
+                      }
+                    }}
+                    backButton={null}
+                    nextButton={null}
+                  />
+                </Box>
+
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  endIcon={<ArrowForward />}
+                >
+                  Siguiente
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
+  );
+};
+
+const styles = {
+  root: {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    bgcolor: 'grey.100'
+  },
+  mainContainer: {
+    flex: 1,
+    p: 3,
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  progressContainer: {
+    px: { xs: 3, sm: 5 },
+		py: 2,
+		pb: 3
+  },
+  stepperContainer: {
+    height: '100%',
+    '& > *': {
+      height: '100%'
+    }
+  },
+  paper: {
+    width: '100%',
+    borderRadius: 2,
+    overflow: 'hidden',
+    boxShadow: 3,
+    p: 2,
+    height: '100%'
+  },
+  title: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    mb: 1
+  },
+  subtitle: {
+    textAlign: 'center',
+    mb: 4
+  },
+  mapContainer: {
+    width: '100%',
+    height: '280px',
+  },
+  label: {
+    color: 'text.primary',
+    fontWeight: 500,
+    mb: 1
+  },
+  areaContainer: {
+    mt: 2
+  },
+  navigationContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    mt: 3,
+    pt: 2,
+    borderTop: '1px solid',
+    borderColor: 'divider',
+    '& .MuiButton-root': {
+      minWidth: { xs: '100px', md: '120px' }
+    },
+    '& .MuiMobileStepper-dots': {
+      '& .MuiMobileStepper-dot': {
+        mx: 0.5,
+        backgroundColor: 'grey.400'
+      },
+      '& .MuiMobileStepper-dotActive': {
+        backgroundColor: 'primary.main'
+      }
+    }
+  }
 };
 
 export default FormPageUbicacion;

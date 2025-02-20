@@ -1,7 +1,17 @@
-import { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+	Box,
+	Button,
+	Grid,
+	Paper,
+	Typography,
+	FormControlLabel,
+	Checkbox,
+  MobileStepper,
+} from '@mui/material';
+import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import Header from '../../components/ui/Header';
-import Button from '../../components/ui/Button';
 import ProgressSteps from '../../components/ui/ProgressSteps';
 
 const FormPageDeclaracion = () => {
@@ -9,76 +19,225 @@ const FormPageDeclaracion = () => {
 	const steps = ['Modalidad', 'Solicitante', 'Representante', 'Establecimiento', 'Ubicación', 'Declaración'];
 	const currentStep = 6;
 
-	const [declarations, setDeclarations] = useState({
+	const [declarations, setDeclarations] = React.useState({
 		legalRepresentative: false,
 		safetyCompliance: false,
 		professionalTitle: false,
 	});
+
+	const handleBack = () => navigate('/formulario/pag-ubicacion');
+  //Esta para implementar el resumen
+	const handleNext = () => navigate('/formulario/resumen');
 
 	const handleCheckboxChange = (key) => {
 		setDeclarations({ ...declarations, [key]: !declarations[key] });
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-50 flex justify-center items-start px-2 pb-2 pt-3'>
-			<div className='w-[900px] min-h-[550px] bg-white rounded-lg shadow-lg overflow-hidden'>
-				<Header title='Trámite de Licencia' />
-				<ProgressSteps steps={steps} currentStep={currentStep} />
+		<Box sx={styles.root}>
+			<Header title='Trámite de Licencia' />
+			<Box sx={styles.mainContainer}>
+				<Grid container spacing={4} justifyContent="center">
+					{/* ProgressSteps vertical solo en desktop */}
+					<Grid item xs={12} md={2.5} sx={{ display: { xs: 'none', md: 'block' } }}>
+						<Box sx={styles.stepperContainer}>
+							<ProgressSteps 
+								steps={steps} 
+								currentStep={currentStep}
+								onBack={handleBack}
+								onNext={handleNext}
+							/>
+						</Box>
+					</Grid>
 
-				{/* Contenido Principal */}
-				<div className='px-16 py-2'>
-					<h2 className='text-center text-xl sm:text-2xl font-bold mb-4'>Declaración Jurada</h2>
+					{/* Contenido principal */}
+					<Grid item xs={12} md={7}>
+						<Paper sx={styles.paper}>
+							<Box sx={styles.contentHeader}>
+								<Typography variant="h5" sx={styles.title}>
+									Declaración Jurada
+								</Typography>
+								<Typography variant="body1" color="text.secondary" sx={styles.subtitle}>
+									Lea atentamente y marque las declaraciones
+								</Typography>
+							</Box>
 
-					<p className='text-gray-700 mb-4 font-medium'>Declaro (DE CORRESPONDER, MARCAR CON X):</p>
+							<Box sx={styles.formContainer}>
+								<Grid container spacing={2}>
+									<Grid item xs={12}>
+										<Box sx={styles.sectionContainer}>
+											<Typography variant="subtitle1" sx={styles.sectionTitle}>
+												Declaraciones
+											</Typography>
+											
+											<Box sx={styles.declarationContainer}>
+												<FormControlLabel
+													control={
+														<Checkbox 
+															checked={declarations.legalRepresentative} 
+															onChange={() => handleCheckboxChange('legalRepresentative')} 
+														/>
+													}
+													label={
+														<Typography variant="body2">
+															Cuento con poder suficiente vigente para actuar como representante legal de la persona jurídica conductora (alternativamente, de la persona natural que represento).
+														</Typography>
+													}
+												/>
+											</Box>
 
-					{/* Lista de declaraciones */}
-					<div className='space-y-4'>
-						{[
-							{
-								key: 'legalRepresentative',
-								text: 'Cuento con poder suficiente vigente para actuar como representante legal de la persona jurídica conductora (alternativamente, de la persona natural que represento).',
-							},
-							{
-								key: 'safetyCompliance',
-								text: 'El establecimiento cumple con las condiciones de seguridad en edificaciones y me someto a la inspección técnica que corresponda en función al nivel de riesgo, de conformidad con la legislación aplicable.',
-							},
-							{
-								key: 'professionalTitle',
-								text: 'Cuento con título profesional vigente y estoy habilitado por el colegio profesional correspondiente (en el caso de servicios relacionados con la salud).',
-							},
-						].map((item) => (
-							<div key={item.key} className='flex items-start space-x-4 bg-gray-100 p-3 rounded-lg shadow-sm'>
-								<input
-									type='checkbox'
-									checked={declarations[item.key]}
-									onChange={() => handleCheckboxChange(item.key)}
-									className='w-6 h-6 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
-								/>
-								<span className='text-gray-700'>{item.text}</span>
-							</div>
-						))}
+											<Box sx={styles.declarationContainer}>
+												<FormControlLabel
+													control={
+														<Checkbox 
+															checked={declarations.safetyCompliance} 
+															onChange={() => handleCheckboxChange('safetyCompliance')} 
+														/>
+													}
+													label={
+														<Typography variant="body2">
+															El establecimiento cumple con las condiciones de seguridad en edificaciones y me someto a la inspección técnica que corresponda en función al nivel de riesgo, de conformidad con la legislación aplicable.
+														</Typography>
+													}
+												/>
+											</Box>
 
-						{/* Texto Descriptivo sin checkbox */}
-						<div className='bg-gray-100 p-3 rounded-lg shadow-sm'>
-							<span className='text-gray-700'>
-								Tengo conocimiento de que la presente Declaración Jurada y documentación está sujeta a
-								fiscalización posterior. En caso de haber proporcionado información falsa, se aplicarán sanciones y
-								la revocatoria de la licencia otorgada.
-							</span>
-						</div>
-					</div>
+											<Box sx={styles.declarationContainer}>
+												<FormControlLabel
+													control={
+														<Checkbox 
+															checked={declarations.professionalTitle} 
+															onChange={() => handleCheckboxChange('professionalTitle')} 
+														/>
+													}
+													label={
+														<Typography variant="body2">
+															Cuento con título profesional vigente y estoy habilitado por el colegio profesional correspondiente (en el caso de servicios relacionados con la salud).
+														</Typography>
+													}
+												/>
+											</Box>
+										</Box>
+									</Grid>
+								</Grid>
+							</Box>
 
-					
+							<Box sx={styles.navigationContainer}>
+								<Button 
+									variant="outlined" 
+									onClick={handleBack}
+									startIcon={<ArrowBack />}
+								>
+									Anterior
+								</Button>
 
-					{/* Navegación */}
-					<div className='flex justify-between mt-8'>
-						<Button label='Anterior' variant='secondary' onClick={() => navigate('/formulario/pag-ubicacion')} />
-						<Button label='Finalizar' variant='primary' onClick={() => alert('Formulario completado')} />
-					</div>
-				</div>
-			</div>
-		</div>
+                {/* Mostrar MobileStepper solo en móvil */}
+                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                  <MobileStepper
+                    variant="dots"
+                    steps={steps.length}
+                    position="static"
+                    activeStep={currentStep - 1}
+                    sx={{
+                      backgroundColor: 'transparent',
+                      width: 'auto',
+                      px: 2,
+                      '& .MuiMobileStepper-dots': {
+                        mt: 0
+                      }
+                    }}
+                    backButton={null}
+                    nextButton={null}
+                  />
+                </Box>
+
+
+								<Button 
+									variant="contained" 
+									onClick={handleNext}
+									endIcon={<ArrowForward />}
+								>
+									Finalizar
+								</Button>
+							</Box>
+						</Paper>
+					</Grid>
+				</Grid>
+			</Box>
+		</Box>
 	);
+};
+
+const styles = {
+	root: {
+		minHeight: '100vh',
+		display: 'flex',
+		flexDirection: 'column',
+		bgcolor: 'grey.100',
+	},
+	mainContainer: {
+		flex: 1,
+		p: 2,
+		display: 'flex',
+		flexDirection: 'column'
+	},
+	stepperContainer: {
+		height: '100%',
+		'& > *': {
+			height: '100%'
+		}
+	},
+	paper: {
+		width: '100%',
+		borderRadius: 2,
+		overflow: 'hidden',
+		boxShadow: 3,
+		p: 2,
+		height: '100%',
+		backgroundColor: 'white'
+	},
+	contentHeader: {
+		textAlign: 'center',
+		mb: 3
+	},
+	title: {
+		textAlign: 'center',
+		fontWeight: 600,
+		color: '#1e293b',
+	},
+	subtitle: {
+		textAlign: 'center',
+		mt: 1,
+		color: 'text.secondary'
+	},
+	formContainer: {
+		mt: 2
+	},
+	sectionContainer: {
+		mb: 3
+	},
+	sectionTitle: {
+		fontWeight: 600,
+		color: '#475569',
+		mb: 2
+	},
+	declarationContainer: {
+		mb: 2,
+		p: 2,
+		backgroundColor: '#f8fafc',
+		borderRadius: 1,
+		'& .MuiFormControlLabel-root': {
+			margin: 0,
+		},
+		'& .MuiTypography-root': {
+			color: '#475569',
+		}
+	},
+	navigationContainer: {
+		mt: 4,
+		display: 'flex',
+		justifyContent: 'space-between'
+	}
 };
 
 export default FormPageDeclaracion;
