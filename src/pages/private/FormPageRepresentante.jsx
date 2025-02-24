@@ -143,12 +143,12 @@ const FormPageRepresentante = () => {
 										position="static"
 										activeStep={currentStep - 1}
 										sx={{
-										backgroundColor: 'transparent',
-										width: 'auto',
-										px: 2,
-										'& .MuiMobileStepper-dots': {
-											mt: 0
-										}
+											backgroundColor: 'transparent',
+											width: 'auto',
+											px: 2,
+											'& .MuiMobileStepper-dots': {
+												mt: 0
+											}
 										}}
 										backButton={null}
 										nextButton={null}
@@ -188,21 +188,21 @@ const styles = {
 		px: { xs: 3, sm: 5 },
 		py: 2,
 		pb: 3
-	  },
-	  stepperContainer: {
+	},
+	stepperContainer: {
 		height: '100%',
 		'& > *': {
-		  height: '100%'
+			height: '100%'
 		}
 	},
+	// Se eliminó "height: '100%'" para que el contenedor se ajuste al contenido
 	paper: {
 		width: '100%',
-    	borderRadius: 2,
-    	overflow: 'hidden',
-    	boxShadow: 3,
-    	p: 2,
-    	height: '100%',
-    	backgroundColor: 'white'
+		borderRadius: 2,
+		overflow: 'hidden',
+		boxShadow: 3,
+		p: 2,
+		backgroundColor: 'white'
 	},
 	contentContainer: {
 		display: 'flex',

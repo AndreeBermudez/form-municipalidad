@@ -116,18 +116,6 @@ const FormPageOne = () => {
 									</Grid>
 								</Grid>
 							</Box>
-
-							{/* Botón de Salir */}
-							<Box sx={styles.exitButtonContainer}>
-								<Button
-									variant="contained"
-									color="error"
-									onClick={handleSalir}
-									sx={styles.exitButton}
-								>
-									Salir
-								</Button>
-							</Box>
 						</Paper>
 					</Grid>
 				</Grid>

@@ -8,7 +8,7 @@ import {
 	Typography,
 	FormControlLabel,
 	Checkbox,
-  MobileStepper,
+	MobileStepper,
 } from '@mui/material';
 import { ArrowBack, ArrowForward } from '@mui/icons-material';
 import Header from '../../components/ui/Header';
@@ -26,7 +26,7 @@ const FormPageDeclaracion = () => {
 	});
 
 	const handleBack = () => navigate('/formulario/pag-ubicacion');
-  //Esta para implementar el resumen
+	// Redirige al resumen final
 	const handleNext = () => navigate('/formulario/resumen');
 
 	const handleCheckboxChange = (key) => {
@@ -35,7 +35,7 @@ const FormPageDeclaracion = () => {
 
 	return (
 		<Box sx={styles.root}>
-			<Header title='Trámite de Licencia' />
+			<Header title="Trámite de Licencia" />
 			<Box sx={styles.mainContainer}>
 				<Grid container spacing={4} justifyContent="center">
 					{/* ProgressSteps vertical solo en desktop */}
@@ -131,26 +131,25 @@ const FormPageDeclaracion = () => {
 									Anterior
 								</Button>
 
-                {/* Mostrar MobileStepper solo en móvil */}
-                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                  <MobileStepper
-                    variant="dots"
-                    steps={steps.length}
-                    position="static"
-                    activeStep={currentStep - 1}
-                    sx={{
-                      backgroundColor: 'transparent',
-                      width: 'auto',
-                      px: 2,
-                      '& .MuiMobileStepper-dots': {
-                        mt: 0
-                      }
-                    }}
-                    backButton={null}
-                    nextButton={null}
-                  />
-                </Box>
-
+								{/* Mostrar MobileStepper solo en móvil */}
+								<Box sx={{ display: { xs: 'block', md: 'none' } }}>
+									<MobileStepper
+										variant="dots"
+										steps={steps.length}
+										position="static"
+										activeStep={currentStep - 1}
+										sx={{
+											backgroundColor: 'transparent',
+											width: 'auto',
+											px: 2,
+											'& .MuiMobileStepper-dots': {
+												mt: 0
+											}
+										}}
+										backButton={null}
+										nextButton={null}
+									/>
+								</Box>
 
 								<Button 
 									variant="contained" 
@@ -176,7 +175,6 @@ const styles = {
 		bgcolor: 'grey.100',
 	},
 	mainContainer: {
-		flex: 1,
 		p: 2,
 		display: 'flex',
 		flexDirection: 'column'
@@ -187,13 +185,13 @@ const styles = {
 			height: '100%'
 		}
 	},
+	// Se elimina "height: '100%'" para que el contenedor se ajuste al contenido\n	paper: {\n		width: '100%',\n		borderRadius: 2,\n		overflow: 'hidden',\n		boxShadow: 3,\n		p: 2,\n		backgroundColor: 'white'\n	},
 	paper: {
 		width: '100%',
 		borderRadius: 2,
 		overflow: 'hidden',
 		boxShadow: 3,
 		p: 2,
-		height: '100%',
 		backgroundColor: 'white'
 	},
 	contentHeader: {

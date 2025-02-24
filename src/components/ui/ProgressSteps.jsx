@@ -16,32 +16,46 @@ const ProgressSteps = ({ steps, currentStep }) => {
 
   if (isMobile) {
     return (
-      <Box sx={{
-        width: '100%',
-        textAlign: 'center',
-        mb: 2
-      }}>
-        <Typography variant="h6" sx={{
-          fontWeight: 'bold',
-          color: 'primary.main'
-        }}>
+      <Paper
+        sx={{
+          width: '280px',         // Tamaño fijo para móviles
+          height: '300px',         // Tamaño fijo para móviles
+          overflowY: 'auto',       // Scroll vertical si el contenido excede
+          boxShadow: 3,
+          p: 2,
+          flexShrink: 0,          // Evita que se encoja en un contenedor flex
+        }}
+      >
+        <Typography 
+          variant="h6" 
+          sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'center' }}
+        >
           {steps[currentStep - 1]}
         </Typography>
-      </Box>
+      </Paper>
     );
   }
 
   return (
-    <Paper sx={{
-      p: 2,
-      height: '100%',
-      boxShadow: 3,
-    }}>
-      <Stepper activeStep={currentStep - 1} orientation="vertical" sx={{
-        '& .MuiStepLabel-root': {
-          py: 1,
-        }
-      }}>
+    <Paper
+      sx={{
+        width: '300px',         // Tamaño fijo para escritorio
+        height: '600px',         // Tamaño fijo para escritorio
+        overflowY: 'auto',       // Scroll vertical si el contenido excede
+        boxShadow: 3,
+        p: 2,
+        flexShrink: 0,          // Evita que se encoja en un contenedor flex
+      }}
+    >
+      <Stepper 
+        activeStep={currentStep - 1} 
+        orientation="vertical"
+        sx={{
+          '& .MuiStepLabel-root': {
+            py: 1,
+          }
+        }}
+      >
         {steps.map((label, index) => (
           <Step key={index}>
             <StepLabel>{label}</StepLabel>
