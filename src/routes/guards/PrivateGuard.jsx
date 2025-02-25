@@ -1,8 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 export const PrivateGuard = () => {
-    const isAuthenticate = true;
-    return (
-        isAuthenticate ? <Outlet/> : <Navigate to={'/login'} replace />
-    );
+    const isAuthenticated = true;
+  return isAuthenticated ? <Outlet/> : <Navigate to={'/login'} replace/>
 }

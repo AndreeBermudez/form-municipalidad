@@ -1,9 +1,10 @@
-import {AppRouter} from './routes/AppRouter';
 
-function App() {
-  return (
-    <AppRouter/>
-  );
+function App({ children }) {
+	return (
+		<>
+			{children}
+		</>
+	);
 }
 
 export default App;

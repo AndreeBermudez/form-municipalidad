@@ -1,18 +1,19 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import InicioForm from '../pages/public/InicioForm';
+import { BrowserRouter, Navigate, Route } from 'react-router-dom';
+import { RoutesWithNotFound } from './components/RoutesWithNotFound';
 import { PrivateGuard } from './guards/PrivateGuard';
 import { PrivateRouter } from './PrivateRouter';
+import { FormPage } from '../pages/private/FormPage';
 
 export const AppRouter = () => {
 	return (
 		<BrowserRouter>
-			<Routes>
-				<Route path='/' element={<Navigate to={'/inicio'} />} />
-				<Route path='/inicio' element={<InicioForm />} />
+			<RoutesWithNotFound>
+				<Route path='/' element={<Navigate to={'/home'} />} />
+				<Route path='/home' element={<FormPage />} />
 				<Route element={<PrivateGuard />}>
-					<Route path='/formulario/*' element={<PrivateRouter />} />
+					<Route path='/form/*' element={<PrivateRouter />} />
 				</Route>
-			</Routes>
+			</RoutesWithNotFound>
 		</BrowserRouter>
 	);
 };
