@@ -1,12 +1,15 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, TextField, Button, Divider } from '@mui/material';
 import { ArrowBack, Send } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 
 const FormularioResumen = () => {
   const navigate = useNavigate();
-  
+  const location = useLocation();
+  // Se extrae el tipo de persona; si no se especifica, se asume "juridica"
+  const personType = location.state?.personType || 'juridica';
+
   const [formData] = React.useState({
     modalidad: '',
     ruc: '',
@@ -27,11 +30,9 @@ const FormularioResumen = () => {
     declaraciones: '',
   });
 
-  // Se mantiene handleChange en caso de que en el futuro se requiera actualizar el estado, 
-  // pero al usar disabled, los campos no serán editables.
+  // Handler placeholder (si en el futuro se permite editar)
   const handleChange = (field) => (event) => {
-    // Si en el futuro deseas habilitar la edición, puedes quitar el disabled
-    // y usar este handler.
+    // Lógica para actualizar el estado en caso de habilitar la edición.
   };
 
   return (
@@ -115,41 +116,44 @@ const FormularioResumen = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          {/* Representante Legal */}
-          <Typography variant="h6" sx={{ mb: 1, color: "text.secondary" }}>
-            Representante Legal
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Apellidos y Nombres"
-                value={formData.representanteNombre}
-                disabled
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Número DNI/CE"
-                value={formData.representanteDni}
-                disabled
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Número de partida electrónica"
-                value={formData.representantePartida}
-                disabled
-                variant="outlined"
-              />
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ my: 3 }} />
+          {/* Representante Legal - Solo para persona jurídica */}
+          {personType === 'juridica' && (
+            <>
+              <Typography variant="h6" sx={{ mb: 1, color: "text.secondary" }}>
+                Representante Legal
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Apellidos y Nombres"
+                    value={formData.representanteNombre}
+                    disabled
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Número DNI/CE"
+                    value={formData.representanteDni}
+                    disabled
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Número de partida electrónica"
+                    value={formData.representantePartida}
+                    disabled
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 3 }} />
+            </>
+          )}
 
           {/* Datos del Establecimiento */}
           <Typography variant="h6" sx={{ mb: 1, color: "text.secondary" }}>

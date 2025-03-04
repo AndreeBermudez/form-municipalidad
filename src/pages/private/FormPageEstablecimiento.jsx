@@ -250,7 +250,7 @@ const FormPageEstablecimiento = () => {
                   onClick={handleNext}
                   endIcon={<ArrowForward />}
                 >
-                  Siguiente
+                  Continuar
                 </Button>
               </Box>
             </Paper>

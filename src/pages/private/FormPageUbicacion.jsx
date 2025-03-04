@@ -145,7 +145,7 @@ const FormPageUbicacion = () => {
                   onClick={handleNext}
                   endIcon={<ArrowForward />}
                 >
-                  Siguiente
+                  Continuar
                 </Button>
               </Box>
             </Paper>
