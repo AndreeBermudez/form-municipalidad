@@ -1,14 +1,5 @@
 import React from 'react';
-import { 
-  Stepper, 
-  Step, 
-  StepLabel, 
-  Box, 
-  Paper, 
-  Typography, 
-  useTheme, 
-  useMediaQuery 
-} from '@mui/material';
+import { Stepper, Step, StepLabel, Box, Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
 
 const ProgressSteps = ({ steps, currentStep }) => {
   const theme = useTheme();
@@ -18,18 +9,15 @@ const ProgressSteps = ({ steps, currentStep }) => {
     return (
       <Paper
         sx={{
-          width: '280px',         // Tamaño fijo para móviles
-          height: '300px',         // Tamaño fijo para móviles
-          overflowY: 'auto',       // Scroll vertical si el contenido excede
+          width: '280px',
+          height: '300px',
+          overflowY: 'auto',
           boxShadow: 3,
           p: 2,
-          flexShrink: 0,          // Evita que se encoja en un contenedor flex
+          flexShrink: 0,
         }}
       >
-        <Typography 
-          variant="h6" 
-          sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'center' }}
-        >
+        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'center' }}>
           {steps[currentStep - 1]}
         </Typography>
       </Paper>
@@ -39,23 +27,15 @@ const ProgressSteps = ({ steps, currentStep }) => {
   return (
     <Paper
       sx={{
-        width: '300px',         // Tamaño fijo para escritorio
-        height: '600px',         // Tamaño fijo para escritorio
-        overflowY: 'auto',       // Scroll vertical si el contenido excede
+        width: '300px',
+        height: '600px',
+        overflowY: 'auto',
         boxShadow: 3,
         p: 2,
-        flexShrink: 0,          // Evita que se encoja en un contenedor flex
+        flexShrink: 0,
       }}
     >
-      <Stepper 
-        activeStep={currentStep - 1} 
-        orientation="vertical"
-        sx={{
-          '& .MuiStepLabel-root': {
-            py: 1,
-          }
-        }}
-      >
+      <Stepper activeStep={currentStep - 1} orientation="vertical" sx={{ '& .MuiStepLabel-root': { py: 1 } }}>
         {steps.map((label, index) => (
           <Step key={index}>
             <StepLabel>{label}</StepLabel>

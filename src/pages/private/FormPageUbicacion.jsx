@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -18,26 +18,36 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 
 const FormPageUbicacion = () => {
   const navigate = useNavigate();
-  const steps = ['Modalidad', 'Solicitante', 'Representante', 'Establecimiento', 'Ubicación', 'Declaración'];
-  const currentStep = 5;
+  const location = useLocation();
+  // Extraer el tipo de persona; se asume "juridica" por defecto
+  const personType = location.state?.personType || 'juridica';
+
+  // Definir los pasos condicionalmente:
+  // - Para "juridica": se incluyen 6 pasos (con "Representante")
+  // - Para "natural": se usan 5 pasos (se omite "Representante")
+  const steps = personType === 'juridica'
+    ? ['Modalidad', 'Solicitante', 'Representante', 'Establecimiento', 'Ubicación', 'Declaración']
+    : ['Modalidad', 'Solicitante', 'Establecimiento', 'Ubicación', 'Declaración'];
+  // El currentStep para esta página:
+  // - Si es jurídica, Ubicación es el paso 5.
+  // - Si es natural, es el paso 4.
+  const currentStep = personType === 'juridica' ? 5 : 4;
 
   const [address, setAddress] = useState('');
-
-  const position = [-9.085594, -78.578593]
+  const position = [-9.085594, -78.578593];
 
   const handleBack = () => {
-    navigate('/formulario/pag-establecimiento');
+    navigate('/formulario/pag-establecimiento', { state: { personType } });
   };
 
   const handleNext = () => {
-    navigate('/formulario/pag-declaracion');
+    navigate('/formulario/pag-declaracion', { state: { personType } });
   };
 
   return (
     <Box sx={styles.root}>
       <Header title='Trámite de Licencia' />
       <Box sx={styles.mainContainer}>
-
         <Grid container spacing={4} justifyContent="center">
           {/* ProgressSteps vertical solo en desktop */}
           <Grid item xs={12} md={2.5} sx={{ display: { xs: 'none', md: 'block' } }}>
@@ -50,7 +60,6 @@ const FormPageUbicacion = () => {
               />
             </Box>
           </Grid>
-
           
           <Grid item xs={12} md={7}>
             <Paper sx={styles.paper}>
@@ -73,7 +82,7 @@ const FormPageUbicacion = () => {
                 />
               </MapContainer>
 
-              {/* Dirección seleccionada */}
+              {/* Dirección seleccionada (oculto por ahora) */}
               <Box sx={{ display: 'none', mt: 4 }}>
                 <Typography variant="subtitle1" sx={styles.label}>
                   📍 Dirección Seleccionada
@@ -162,8 +171,8 @@ const styles = {
   },
   progressContainer: {
     px: { xs: 3, sm: 5 },
-		py: 2,
-		pb: 3
+    py: 2,
+    pb: 3
   },
   stepperContainer: {
     height: '100%',
