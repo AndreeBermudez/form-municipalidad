@@ -1,26 +1,39 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/imagenes/Escudo_de_Nuevo_Chimbote.png';
+import { useAuthStorage } from '../../storage/authStorage';
 
 const InicioForm = () => {
 	const navigate = useNavigate();
+	const iniciarSesion = useAuthStorage((state) => state.iniciarSesion);
 	const [personType, setPersonType] = useState('juridica');
-	const [formData, setFormData] = useState({
-		paymentCode: '',
-	});
+	const [paymentCode, setPaymentCode] = useState('');
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState(null);
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
-		setFormData((prevData) => ({
+		setPaymentCode((prevData) => ({
 			...prevData,
 			[name]: value,
 		}));
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log('Formulario enviado:', formData);
-		navigate('/formulario/pag-one');
+		try {
+			setIsLoading(true);
+			const response = await iniciarSesion(paymentCode);
+			if (response.success) {
+				navigate('/formulario/pag-one');
+			} else {
+				setError(response.error);
+			}
+		} catch (error) {
+			setError('Error inesperado. Por favor, intente nuevamente.', error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
