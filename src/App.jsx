@@ -1,10 +1,5 @@
-
 function App({ children }) {
-	return (
-		<>
-			{children}
-		</>
-	);
+	return <>{children}</>;
 }
 
 export default App;

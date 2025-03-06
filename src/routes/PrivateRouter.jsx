@@ -16,7 +16,7 @@ export const PrivateRouter = () => {
 			<Route path='pag-establecimiento' element={<FormPageEstablecimiento />} />
 			<Route path='pag-ubicacion' element={<FormPageUbicacion />} />
 			<Route path='pag-declaracion' element={<FormPageDeclaracion />} />
-			<Route path='resumen' element={<FormularioResumen />} /> {/* 👈 Añade esta ruta */}
+			<Route path='resumen' element={<FormularioResumen />} />
 		</Routes>
 	);
 };

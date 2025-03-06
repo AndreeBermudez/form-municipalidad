@@ -1,5 +1,4 @@
-import React from 'react';
-import { Stepper, Step, StepLabel, Box, Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
+import { Paper, Step, StepLabel, Stepper, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 const ProgressSteps = ({ steps, currentStep }) => {
   const theme = useTheme();
