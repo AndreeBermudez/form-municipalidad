@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 export const useAuthStorage = create(
 	persist((set) => ({
 		codigoPago: null,
-		tipoContribuyente: null,
+		tipoContribuyente: null,	
 		codigoPagoAutenticado: false,
 		token: null,
 		iniciarSesion: async (codigoPago) => {
@@ -23,7 +23,7 @@ export const useAuthStorage = create(
                         token: data.token,
                     });
                     localStorage.setItem('authMunicipalidadToken', data.token);
-                    return { success: true, token: data.token };
+                    return { success: true };
                 }
                 return { success: false, error: 'Credenciales inválidas' };
             } catch (error) {
@@ -48,15 +48,14 @@ export const useAuthStorage = create(
 				token: null,
 			});
 		},
-	})),
+	}),
 	{
 		name: 'authStorage',
 		storage: createJSONStorage(() => localStorage),
 		partialize: (state) => ({
 			codigoPago: state.codigoPago,
 			tipoContribuyente: state.tipoContribuyente,
-			codigoPagoAutenticado: state.codigoPagoAutenticado,
-			token: state.token
+			codigoPagoAutenticado: state.codigoPagoAutenticado
 		}),
 	}
-);
+));
