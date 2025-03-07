@@ -16,7 +16,7 @@ export const useAuth = () => {
 			const response = await iniciarSesion(paymentCode);
 			if (response.success) {
 				setContribuyente(type);
-				navigate('/formulario/pag-one');
+				navigate('/formulario/modalidad');
 				return true;
 			} else {
 				setError(response.error || 'Error de autenticación');

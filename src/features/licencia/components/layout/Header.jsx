@@ -1,12 +1,14 @@
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/imagenes/Escudo_de_Nuevo_Chimbote.png';
+import logo from '../../../../assets/imagenes/Escudo_de_Nuevo_Chimbote.png';
 
 const Header = ({ title }) => {
   const navigate = useNavigate();
 
   const handleSalir = () => {
-    navigate('/inicio');
+    if (window.confirm('¿Está seguro que desea salir? Se perderán los datos no guardados.')) {
+      navigate('/login');
+    }
   };
 
   return (

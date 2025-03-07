@@ -1,22 +1,23 @@
-import { Route, Routes } from 'react-router-dom';
-import FormPageOne from '../pages/private/FormPageOne';
-import FormPageInder from '../pages/private/FormPageInder';
-import FormPageRepresentante from '../pages/private/FormPageRepresentante';
-import FormPageEstablecimiento from '../pages/private/FormPageEstablecimiento';
-import FormPageUbicacion from '../pages/private/FormPageUbicacion';
-import FormPageDeclaracion from '../pages/private/FormPageDeclaracion';
-import FormularioResumen from '../pages/private/FormularioResumen'; // 👈 Añade esta línea
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { ModalidadPage } from '../pages/private/ModalidadPage';
+import { SolicitantePage } from '../pages/private/SolicitantePage';
+import { RepresentantePage } from '../pages/private/RepresentantePage';
+import { EstablecimientoPage } from '../pages/private/EstablecimientoPage';
+import { UbicacionPage } from '../pages/private/UbicacionPage';
+import { DeclaracionPage } from '../pages/private/DeclaracionPage';
+import { ResumenPage } from '../pages/private/ResumenPage';
 
 export const PrivateRouter = () => {
 	return (
 		<Routes>
-			<Route path='pag-one' element={<FormPageOne />} />
-			<Route path='pag-inder' element={<FormPageInder />} />
-			<Route path='pag-representante' element={<FormPageRepresentante />} />
-			<Route path='pag-establecimiento' element={<FormPageEstablecimiento />} />
-			<Route path='pag-ubicacion' element={<FormPageUbicacion />} />
-			<Route path='pag-declaracion' element={<FormPageDeclaracion />} />
-			<Route path='resumen' element={<FormularioResumen />} />
+			<Route path='' element={<Navigate to={'modalidad'} />} />
+			<Route path='modalidad' element={<ModalidadPage />} />
+			<Route path='solicitante' element={<SolicitantePage />} />
+			<Route path='representante' element={<RepresentantePage />} />
+			<Route path='establecimiento' element={<EstablecimientoPage />} />
+			<Route path='ubicacion' element={<UbicacionPage />} />
+			<Route path='declaracion' element={<DeclaracionPage />} />
+			<Route path='resumen' element={<ResumenPage />} />
 		</Routes>
 	);
 };
