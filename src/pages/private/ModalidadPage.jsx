@@ -4,7 +4,7 @@ import { FormLayout } from '../../layout/FormLayout';
 import { ModalityCard } from '../../features/licencia/components/modality/ModalityCard';
 import { TemporalModal } from '../../features/licencia/components/modality/TemporalModal';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
-// import { useAuthStorage } from '../../storage/authStorage';
+import { useFormStorage } from '../../storage/formStorage'; 
 
 // Imágenes
 import indeterminadaImg from '../../assets/imagenes/inderteminada.jpg';
@@ -12,12 +12,12 @@ import temporalImg from '../../assets/imagenes/reloj-tiempo.jpg';
 
 export const ModalidadPage = () => {
 	const [showModal, setShowModal] = useState(false);
-	const [dates, setDates] = useState({ from: '', to: '' });
+	const [dates, setDates] = useState(null);
 	const { goToNext } = useFormNavigation();
-	// const setTipoLicencia = useAuthStorage((state) => state.setTipoLicencia);
+	const updateTipoLicencia = useFormStorage((state) => state.updateTipoLicencia);
 
 	const handleSelectIndeterminada = () => {
-		// setTipoLicencia('indeterminada');
+		updateTipoLicencia({ tipo: 'Indeterminada', vigencia: null });
 		goToNext();
 	};
 
@@ -29,8 +29,8 @@ export const ModalidadPage = () => {
 		setShowModal(false);
 	};
 
-	const handleConfirmTemporal = () => {
-		// setTipoLicencia('temporal', { fechaInicio: dates.from, fechaFin: dates.to });
+	const handleConfirmTemporal = (fechaPlazo) => {
+		updateTipoLicencia({ tipo: 'Temporal', vigencia: fechaPlazo });
 		setShowModal(false);
 		goToNext();
 	};

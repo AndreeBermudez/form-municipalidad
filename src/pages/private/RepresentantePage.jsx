@@ -1,19 +1,14 @@
 import { useState } from 'react';
-import {
-	Grid,
-	TextField,
-	Select,
-	MenuItem,
-	Box,
-	Typography,
-	InputAdornment,
-} from '@mui/material';
+import { Grid, TextField, Select, MenuItem, Box, Typography, InputAdornment } from '@mui/material';
 import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
+import { useFormStorage } from '../../storage/formStorage';
 
 export const RepresentantePage = () => {
 	const { currentStepIndex } = useFormNavigation();
+	const updateRepresentanteData = useFormStorage((state) => state.updateRepresentanteData);
+	const representanteData = useFormStorage((state) => state.representanteData);
 
 	// Estado para los campos del formulario
 	const [formData, setFormData] = useState({
@@ -21,14 +16,17 @@ export const RepresentantePage = () => {
 		documentType: '',
 		documentNumber: '',
 		partidaElectronica: '',
-		asientoInscripcion: ''
+		asientoInscripcion: '',
+		...representanteData
 	});
 
 	const handleChange = (field) => (event) => {
+		const newValue = event.target.value
 		setFormData({
 			...formData,
-			[field]: event.target.value,
+			[field]: newValue,
 		});
+		updateRepresentanteData({[field]:newValue})
 	};
 
 	return (
@@ -48,10 +46,10 @@ export const RepresentantePage = () => {
 								<Grid item xs={12}>
 									<TextField
 										fullWidth
-										label="Apellidos y Nombres"
-										variant="outlined"
-										size="small"
-										placeholder="Ingrese el nombre del representante"
+										label='Apellidos y Nombres'
+										variant='outlined'
+										size='small'
+										placeholder='Ingrese el nombre del representante'
 										value={formData.nombreCompleto}
 										onChange={handleChange('nombreCompleto')}
 										sx={styles.textField}
@@ -61,26 +59,26 @@ export const RepresentantePage = () => {
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label="N° DNI / CE"
-										placeholder="Ingrese número"
-										variant="outlined"
-										size="small"
+										label='N° DNI / CE'
+										placeholder='Ingrese número'
+										variant='outlined'
+										size='small'
 										value={formData.documentNumber}
 										onChange={handleChange('documentNumber')}
 										sx={styles.textField}
 										InputProps={{
 											startAdornment: (
-												<InputAdornment position="start">
+												<InputAdornment position='start'>
 													<Select
-														variant="standard"
+														variant='standard'
 														value={formData.documentType}
 														onChange={handleChange('documentType')}
 														sx={styles.documentTypeSelect}
-														defaultValue=""
-														size="small">
-														<MenuItem value="">↓</MenuItem>
-														<MenuItem value="DNI">DNI</MenuItem>
-														<MenuItem value="CE">CE</MenuItem>
+														defaultValue=''
+														size='small'>
+														<MenuItem value=''>↓</MenuItem>
+														<MenuItem value='DNI'>DNI</MenuItem>
+														<MenuItem value='CE'>CE</MenuItem>
 													</Select>
 												</InputAdornment>
 											),
@@ -91,10 +89,10 @@ export const RepresentantePage = () => {
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label="N° de partida electrónica"
-										variant="outlined"
-										size="small"
-										placeholder="Ingrese el número de partida"
+										label='N° de partida electrónica'
+										variant='outlined'
+										size='small'
+										placeholder='Ingrese el número de partida'
 										value={formData.partidaElectronica}
 										onChange={handleChange('partidaElectronica')}
 										sx={styles.textField}
@@ -104,10 +102,10 @@ export const RepresentantePage = () => {
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label="Asiento de Inscripción Sunarp"
-										variant="outlined"
-										size="small"
-										placeholder="Ingrese el asiento de inscripción"
+										label='Asiento de Inscripción Sunarp'
+										variant='outlined'
+										size='small'
+										placeholder='Ingrese el asiento de inscripción'
 										value={formData.asientoInscripcion}
 										onChange={handleChange('asientoInscripcion')}
 										sx={styles.textField}
@@ -117,7 +115,7 @@ export const RepresentantePage = () => {
 						</Box>
 					</Grid>
 				</Grid>
-				<Box sx={styles.navigationWrapper} >
+				<Box sx={styles.navigationWrapper}>
 					<FormNavigation currentStepIndex={currentStepIndex} />
 				</Box>
 			</Box>
@@ -125,7 +123,6 @@ export const RepresentantePage = () => {
 	);
 };
 
-// Usando los mismos estilos que FormPageRepresentante pero adaptados al formato de SolicitantePage
 const styles = {
 	formContainer: {
 		p: 1,
@@ -137,8 +134,8 @@ const styles = {
 	sectionContainer: {
 		mb: 3,
 		'&:last-child': {
-			mb: 0
-		}
+			mb: 0,
+		},
 	},
 	sectionTitle: {
 		color: '#2c3e50',
@@ -158,8 +155,8 @@ const styles = {
 			},
 		},
 		'& .MuiInputLabel-root': {
-			color: '#4a5568'
-		}
+			color: '#4a5568',
+		},
 	},
 	documentTypeSelect: {
 		'& .MuiSelect-select': {
@@ -173,8 +170,8 @@ const styles = {
 	},
 	navigationWrapper: {
 		marginTop: 'auto',
-		paddingTop: 4
-	}
+		paddingTop: 4,
+	},
 };
 
 export default RepresentantePage;

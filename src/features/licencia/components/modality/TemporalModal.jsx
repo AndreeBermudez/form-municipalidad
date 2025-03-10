@@ -26,7 +26,7 @@ export const TemporalModal = ({ open, onClose, dates, setDates, onConfirm }) => 
 					Licencia Temporal
 				</Typography>
 				<Typography variant='body2' sx={{ mb: 3, color: '#64748b' }}>
-					Seleccione la fecha de inicio y fin.
+					Seleccione la fecha final de plazo.
 				</Typography>
 
 				<Box
@@ -38,18 +38,10 @@ export const TemporalModal = ({ open, onClose, dates, setDates, onConfirm }) => 
 					}}>
 					<TextField
 						fullWidth
-						label='Desde'
+						label='Plazo'
 						type='date'
-						value={dates.from}
-						onChange={(e) => setDates({ ...dates, from: e.target.value })}
-						InputLabelProps={{ shrink: true }}
-					/>
-					<TextField
-						fullWidth
-						label='Hasta'
-						type='date'
-						value={dates.to}
-						onChange={(e) => setDates({ ...dates, to: e.target.value })}
+						value={dates}
+						onChange={(e) => setDates(e.target.value )}
 						InputLabelProps={{ shrink: true }}
 					/>
 				</Box>
@@ -63,7 +55,7 @@ export const TemporalModal = ({ open, onClose, dates, setDates, onConfirm }) => 
 					<Button variant='contained' color='inherit' onClick={onClose}>
 						Cancelar
 					</Button>
-					<Button variant='contained' color='success' onClick={onConfirm} disabled={!dates.from || !dates.to}>
+					<Button variant='contained' color='success' onClick={() => onConfirm(dates)} disabled={!dates}>
 						Continuar
 					</Button>
 				</Box>

@@ -1,12 +1,15 @@
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../../../assets/imagenes/Escudo_de_Nuevo_Chimbote.png';
+import { useFormStorage } from '../../../../storage/formStorage'
 
 const Header = ({ title }) => {
   const navigate = useNavigate();
+  const resetFormulario = useFormStorage((state) => state.resetFormulario)
 
   const handleSalir = () => {
     if (window.confirm('¿Está seguro que desea salir? Se perderán los datos no guardados.')) {
+      resetFormulario()
       navigate('/login');
     }
   };

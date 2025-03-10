@@ -2,10 +2,11 @@ import { useLocation } from 'react-router-dom';
 import { Box, Grid, Paper, Typography } from '@mui/material';
 import Header from '../features/licencia/components/layout/Header';
 import StepIndicator from '../features/licencia/components/layout/StepIndicator';
+import { useAuthStorage } from '../storage/authStorage';
 
 export const FormLayout = ({ children, headerTitle, contentTitle, contentSubtitle, showSteps = true }) => {
 	const location = useLocation();
-	const personType = location.state?.personType || 'juridica';
+	const personType = useAuthStorage((state) => state.tipoContribuyente)
 
 	// Definir los pasos condicionalmente según el tipo de persona
 	const steps =

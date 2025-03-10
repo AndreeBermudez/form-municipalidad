@@ -13,32 +13,39 @@ import {
 import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
+import { useFormStorage } from '../../storage/formStorage';
 
 export const SolicitantePage = () => {
 	const { currentStepIndex } = useFormNavigation();
+	const updateSolicitanteData = useFormStorage((state) => state.updateSolicitanteData)
+	const solicitanteData = useFormStorage((state) => state.solicitanteData)
 
-	// Estado para los campos del formulario
 	const [formData, setFormData] = useState({
 		ruc: '',
 		nombre: '',
+		razonSocial: '',
 		documentType: '',
 		documentNumber: '',
 		email: '',
 		telefono: '',
+		tipoDireccionNum : '',
 		direccionNum: '',
-		direccionTipo: '',
+		tipoDireccion: '',
 		direccionNombre: '',
-		urbanizacionTipo: '',
+		tipoUrbanizacion: '',
 		urbanizacionNombre: '',
 		distrito: '',
 		provincia: '',
+		...solicitanteData
 	});
 
 	const handleChange = (field) => (event) => {
+		const newValue = event.target.value
 		setFormData({
 			...formData,
-			[field]: event.target.value,
+			[field]:newValue,
 		});
+		updateSolicitanteData({ [field]: newValue });
 	};
 
 	return (
@@ -48,21 +55,38 @@ export const SolicitantePage = () => {
 			contentSubtitle='Complete los datos del solicitante de la licencia'>
 			<Box sx={styles.formContainer} >
 				<Grid container spacing={1}>
-					{/* RUC Section */}
+					{/* DNI/CE Section */}
 					<Grid item xs={12}>
 						<Box sx={styles.sectionContainer}>
 							<Typography variant='subtitle1' sx={styles.sectionTitle}>
-								Información de la Empresa
+								Buscar datos del solicitante
 							</Typography>
 							<TextField
 								fullWidth
-								label='N° RUC'
-								placeholder='Ingrese su RUC'
+								label='N° DNI / CE'
+								placeholder='Ingrese número'
 								variant='outlined'
 								size='small'
-								value={formData.ruc}
-								onChange={handleChange('ruc')}
+								value={formData.documentNumber}
+								onChange={handleChange('documentNumber')}
 								sx={styles.textField}
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position='start'>
+											<Select
+												variant='standard'
+												value={formData.documentType}
+												onChange={handleChange('documentType')}
+												sx={styles.documentTypeSelect}
+												defaultValue=''
+												size='small'>
+												<MenuItem value=''>↓</MenuItem>
+												<MenuItem value='DNI'>DNI</MenuItem>
+												<MenuItem value='CE'>CE</MenuItem>
+											</Select>
+										</InputAdornment>
+									),
+								}}
 							/>
 						</Box>
 					</Grid>
@@ -71,14 +95,14 @@ export const SolicitantePage = () => {
 					<Grid item xs={12}>
 						<Box sx={styles.sectionContainer}>
 							<Typography variant='subtitle1' sx={styles.sectionTitle}>
-								Información Personal
+								Información del Solicitante
 							</Typography>
 							<Grid container spacing={2}>
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label='Nombre'
-										placeholder='Ingrese su nombre'
+										label='Apellidos y Nombres / Razón Social'
+										placeholder='Ingrese apellidos y nombres o razón social'
 										variant='outlined'
 										size='small'
 										value={formData.nombre}
@@ -90,30 +114,13 @@ export const SolicitantePage = () => {
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label='N° DNI / CE'
-										placeholder='Ingrese número'
+										label='N° RUC'
+										placeholder='Ingrese su RUC'
 										variant='outlined'
 										size='small'
-										value={formData.documentNumber}
-										onChange={handleChange('documentNumber')}
+										value={formData.ruc}
+										onChange={handleChange('ruc')}
 										sx={styles.textField}
-										InputProps={{
-											startAdornment: (
-												<InputAdornment position='start'>
-													<Select
-														variant='standard'
-														value={formData.documentType}
-														onChange={handleChange('documentType')}
-														sx={styles.documentTypeSelect}
-														defaultValue=''
-														size='small'>
-														<MenuItem value=''>↓</MenuItem>
-														<MenuItem value='DNI'>DNI</MenuItem>
-														<MenuItem value='CE'>CE</MenuItem>
-													</Select>
-												</InputAdornment>
-											),
-										}}
 									/>
 								</Grid>
 
@@ -157,13 +164,31 @@ export const SolicitantePage = () => {
 								<Grid item xs={12} sm={6}>
 									<TextField
 										fullWidth
-										label='N° Int. / Mz / Lt / Otros'
-										placeholder='Ingrese su dirección'
+										label='N° Int. / Mz. / Otros'
+										placeholder='Número o identificación'
 										variant='outlined'
 										size='small'
 										value={formData.direccionNum}
 										onChange={handleChange('direccionNum')}
 										sx={styles.textField}
+										InputProps={{
+											startAdornment: (
+												<InputAdornment position='start'>
+													<Select
+														variant='standard'
+														value={formData.tipoDireccionNum || ''}
+														onChange={handleChange('tipoDireccionNum')}
+														sx={styles.documentTypeSelect}
+														defaultValue=''
+														size='small'>
+														<MenuItem value=''>↓</MenuItem>
+														<MenuItem value='N° Int.'>N° Int.</MenuItem>
+														<MenuItem value='Mz Lt'>Mz Lt</MenuItem>
+														<MenuItem value='Otros'>Otros</MenuItem>
+													</Select>
+												</InputAdornment>
+											),
+										}}
 									/>
 								</Grid>
 
@@ -171,7 +196,7 @@ export const SolicitantePage = () => {
 									<TextField
 										fullWidth
 										label='Av. / Jr. / Ca. / Pje. / Otros'
-										placeholder='Ingrese su dirección'
+										placeholder='Nombre de la vía'
 										variant='outlined'
 										size='small'
 										value={formData.direccionNombre}
@@ -182,8 +207,8 @@ export const SolicitantePage = () => {
 												<InputAdornment position='start'>
 													<Select
 														variant='standard'
-														value={formData.direccionTipo}
-														onChange={handleChange('direccionTipo')}
+														value={formData.tipoDireccion}
+														onChange={handleChange('tipoDireccion')}
 														sx={styles.documentTypeSelect}
 														defaultValue=''
 														size='small'>
@@ -204,7 +229,7 @@ export const SolicitantePage = () => {
 									<TextField
 										fullWidth
 										label='Urb. / AAHH. / Otros'
-										placeholder='Ingrese su dirección'
+										placeholder='Nombre de urbanizacion o asentamiento'
 										variant='outlined'
 										size='small'
 										value={formData.urbanizacionNombre}
@@ -215,8 +240,8 @@ export const SolicitantePage = () => {
 												<InputAdornment position='start'>
 													<Select
 														variant='standard'
-														value={formData.urbanizacionTipo}
-														onChange={handleChange('urbanizacionTipo')}
+														value={formData.tipoUrbanizacion}
+														onChange={handleChange('tipoUrbanizacion')}
 														sx={styles.documentTypeSelect}
 														defaultValue=''
 														size='small'>

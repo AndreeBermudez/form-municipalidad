@@ -1,19 +1,41 @@
 import { Box, Grid, TextField, Typography } from '@mui/material';
 import 'leaflet/dist/leaflet.css';
 import { useState } from 'react';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import { LocationMarker } from '../../features/licencia/components/map/LocationMarker';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormLayout } from '../../layout/FormLayout';
+import { useFormStorage } from '../../storage/formStorage';
 
 export const UbicacionPage = () => {
 	const { currentStepIndex } = useFormNavigation();
-	const [position] = useState([-9.085594, -78.578593]); // Posición inicial del mapa
-	const [address, setAddress] = useState('');
-	const [area, setArea] = useState('');
+	const updateUbicacionData = useFormStorage((state) => state.updateUbicacionData);
+	const ubicacionData = useFormStorage((state) => state.ubicacionData);
+	const ubicationSelected = [ubicacionData.lat || -9.085594,ubicacionData.lng || -78.578593] 
+	const [position, setPosition] = useState(ubicationSelected);
 
-	const handleAreaChange = (e) => {
-		setArea(e.target.value);
+	const [formData, setFormData] = useState({
+		lat: '',
+		lng: '',
+		area: 0,
+		...ubicacionData,
+	});
+
+	const handleChange = (field) => (event) => {
+		const newValue = event.target.value;
+		setFormData({
+			...formData,
+			[field]: newValue,
+		});
+		updateUbicacionData({ [field]: newValue });
+	};
+
+	const handlePosition = (coordenadas) => {
+		setPosition(coordenadas);
+		const { lat, lng } = coordenadas;
+		setFormData({ ...formData, lat, lng });
+		updateUbicacionData({...formData, lat, lng})
 	};
 
 	return (
@@ -32,29 +54,8 @@ export const UbicacionPage = () => {
 										attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 										url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 									/>
-									<Marker position={position}>
-										<Popup>Ubicación del establecimiento</Popup>
-									</Marker>
+									<LocationMarker position={position} handlePosition={handlePosition} />
 								</MapContainer>
-							</Box>
-						</Grid>
-
-						{/* Dirección seleccionada (oculto por ahora) */}
-						<Grid item xs={12}>
-							<Box sx={{ ...styles.sectionContainer, display: 'none' }}>
-								<Typography variant='subtitle1' sx={styles.sectionTitle}>
-									📍 Dirección Seleccionada
-								</Typography>
-								<TextField
-									fullWidth
-									value={address}
-									InputProps={{
-										readOnly: true,
-									}}
-									variant='outlined'
-									size='small'
-									sx={styles.textField}
-								/>
 							</Box>
 						</Grid>
 
@@ -70,8 +71,8 @@ export const UbicacionPage = () => {
 									placeholder='Ingrese el área total en m²'
 									variant='outlined'
 									size='small'
-									value={area}
-									onChange={handleAreaChange}
+									value={formData.area}
+									onChange={handleChange('area')}
 									sx={styles.textField}
 								/>
 							</Box>
