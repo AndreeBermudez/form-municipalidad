@@ -18,7 +18,7 @@ export const ResumenPage = () => {
 
 	const direccionSolicitante = `${solicitanteData.tipoDireccion} ${solicitanteData.direccionNombre} ${solicitanteData.tipoDireccionNum} ${solicitanteData.direccionNum}, ${solicitanteData.tipoUrbanizacion} ${solicitanteData.urbanizacionNombre}, ${solicitanteData.distrito}, ${solicitanteData.provincia}`;
 	const direccionEstablecimiento = `${establecimientoData.tipoDireccion} ${establecimientoData.direccionNombre} ${establecimientoData.tipoDireccionNum} ${establecimientoData.direccionNum}, ${establecimientoData.tipoUrbanizacion} ${establecimientoData.urbanizacionNombre},  ${solicitanteData.provincia}`;
-	// Estado para los datos resumidos del formulario
+	
 	const formData = {
 		modalidad: tipoLicenciaData.tipo,
 		ruc: solicitanteData.ruc,
