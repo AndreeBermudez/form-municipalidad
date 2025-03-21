@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Grid,
   TextField,
@@ -14,7 +14,6 @@ import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
 import { useFormStorage } from '../../storage/formStorage';
-// Importa la validación para actividad sin números
 import { validateActivityNoNumbers } from '../../features/licencia/components/utils/validations';
 
 export const EstablecimientoPage = () => {
@@ -22,11 +21,11 @@ export const EstablecimientoPage = () => {
   const updateEstablecimientoData = useFormStorage((state) => state.updateEstablecimientoData);
   const establecimientoData = useFormStorage((state) => state.establecimientoData);
 
-  // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     nombreComercial: '',
     codigoCiiu: '',
     giro: '',
+    giroId: '',
     actividad: '',
     zonificacion: '',
     tipoDireccionNum: '',
@@ -39,10 +38,83 @@ export const EstablecimientoPage = () => {
     ...establecimientoData,
   });
 
-  // Estado para almacenar el error en el campo "Actividad"
-  const [actividadError, setActividadError] = useState("");
+  const [actividadError, setActividadError] = useState('');
+  const [giros, setGiros] = useState([]);
 
-  // Función para limitar en tiempo real solo letras, números y espacios (para otros campos de dirección)
+  // 1. Al montar el componente, obtenemos la zonificación si el ciudadano tiene un código asociado
+  useEffect(() => {
+    const ciudadanoId = localStorage.getItem('ciudadanoId');
+    if (ciudadanoId) {
+      fetchZonificacion(ciudadanoId);
+    }
+  }, []);
+
+  // 2. Función para obtener la zonificación desde tu API (primer endpoint)
+  const fetchZonificacion = async (idCiudadano) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/public/search/cod/${idCiudadano}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener la zonificación');
+      }
+      const result = await response.json();
+      console.log('Resultado zonificación:', result);
+
+      // Supongamos que en data[0].numeroCodigo está el código que necesitamos
+      const zon = result.data?.[0]?.numeroCodigo || '';
+      if (zon) {
+        // Actualizamos el formulario y el store
+        setFormData((prev) => ({ ...prev, zonificacion: zon }));
+        updateEstablecimientoData({ zonificacion: zon });
+
+        // Llamamos al segundo endpoint para ver todo el JSON relacionado
+        fetchInfoByCodigo(zon);
+      }
+    } catch (error) {
+      console.error('Error fetchZonificacion:', error);
+    }
+  };
+
+  // 3. Función para obtener todo el JSON con el código de zonificación (segundo endpoint)
+  const fetchInfoByCodigo = async (codigo) => {
+    try {
+      // Endpoint: http://localhost:8080/api/v1/public/search/{codigo}
+      const response = await fetch(`http://localhost:8080/api/v1/public/search/${codigo}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener la información completa de la zonificación');
+      }
+      const result = await response.json();
+      console.log('JSON completo de la zonificación:', result);
+      // Si deseas, puedes guardar más datos en tu store o setear más campos en formData
+    } catch (error) {
+      console.error('Error en fetchInfoByCodigo:', error);
+    }
+  };
+
+  // 4. useEffect para obtener la lista de giros y llenar el combo
+  useEffect(() => {
+    const fetchGiros = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/authentication/listar/todos/losgiros');
+        if (!response.ok) {
+          throw new Error('Error al obtener los giros');
+        }
+        const result = await response.json();
+        const { data } = result;
+        if (Array.isArray(data)) {
+          setGiros(data);
+        } else {
+          console.error('La propiedad data no es un array:', data);
+          setGiros([]);
+        }
+      } catch (error) {
+        console.error('Error fetching giros:', error);
+        setGiros([]);
+      }
+    };
+    fetchGiros();
+  }, []);
+
+  // Función para limitar caracteres (letras, números y espacios)
   const handleKeyPressLettersNumbers = (event) => {
     const regex = /^[A-Za-z0-9\s]$/;
     if (!regex.test(event.key)) {
@@ -50,22 +122,45 @@ export const EstablecimientoPage = () => {
     }
   };
 
+  // Manejador genérico para cambios en el formulario
   const handleChange = (field) => (event) => {
     const newValue = event.target.value;
-    setFormData({
-      ...formData,
-      [field]: newValue,
-    });
+    setFormData((prev) => ({ ...prev, [field]: newValue }));
     updateEstablecimientoData({ [field]: newValue });
 
-    // Si el campo es "actividad", se valida para que no contenga números
     if (field === 'actividad') {
       const errorMsg = validateActivityNoNumbers(newValue);
       setActividadError(errorMsg);
     }
   };
 
-  // Definimos los campos obligatorios para habilitar el botón "Continuar"
+  // Manejador para el cambio en el combo de giros
+  const handleGiroChange = (event) => {
+    const selectedGiroId = parseInt(event.target.value, 10);
+    const giroObj = giros.find((g) => g.giroId === selectedGiroId);
+
+    setFormData((prev) => ({
+      ...prev,
+      giro: giroObj ? giroObj.nombre : '',
+      codigoCiiu: giroObj ? giroObj.codigoCiiu : '',
+      giroId: giroObj ? giroObj.giroId : '',
+    }));
+
+    updateEstablecimientoData({
+      giro: giroObj ? giroObj.nombre : '',
+      codigoCiiu: giroObj ? giroObj.codigoCiiu : '',
+      giroId: giroObj ? giroObj.giroId : '',
+    });
+
+    if (giroObj) {
+      localStorage.setItem('giroId', giroObj.giroId);
+      localStorage.setItem('codigoCiiu', giroObj.codigoCiiu);
+    } else {
+      localStorage.removeItem('giroId');
+      localStorage.removeItem('codigoCiiu');
+    }
+  };
+
   const requiredFields = [
     'nombreComercial',
     'codigoCiiu',
@@ -76,10 +171,9 @@ export const EstablecimientoPage = () => {
     'provincia',
   ];
 
-  // Se considera válido si todos los campos obligatorios tienen contenido (no vacío) y no hay error en actividad
-  const isValid = requiredFields.every(
-    (field) => formData[field] && formData[field].toString().trim() !== ''
-  ) && actividadError === "";
+  const isValid =
+    requiredFields.every((field) => formData[field]?.toString().trim() !== '') &&
+    actividadError === '';
 
   return (
     <FormLayout
@@ -90,13 +184,14 @@ export const EstablecimientoPage = () => {
       <Box sx={styles.formContainer}>
         <Box sx={styles.scrollArea}>
           <Grid container spacing={1}>
-            {/* Información del Establecimiento Section */}
+            {/* Información del Establecimiento */}
             <Grid item xs={12}>
               <Box sx={styles.sectionContainer}>
                 <Typography variant='subtitle1' sx={styles.sectionTitle}>
                   Información del Establecimiento
                 </Typography>
                 <Grid container spacing={2}>
+                  {/* Nombre Comercial */}
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
@@ -110,34 +205,38 @@ export const EstablecimientoPage = () => {
                     />
                   </Grid>
 
-                  {/* Primera fila: Código CIIU y Giros */}
+                  {/* Combo de Giros */}
+                  <Grid item xs={12} sm={6}>
+                    <FormControl fullWidth variant='outlined' size='small' sx={styles.textField}>
+                      <InputLabel>Giros</InputLabel>
+                      <Select label='Giros' value={formData.giroId || ''} onChange={handleGiroChange}>
+                        <MenuItem value=''>
+                          <em>Seleccione el giro correspondiente</em>
+                        </MenuItem>
+                        {giros.map((giroItem) => (
+                          <MenuItem key={giroItem.giroId} value={giroItem.giroId}>
+                            {giroItem.nombre}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+
+                  {/* Código CIIU (deshabilitado) */}
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       label='Código CIIU'
                       variant='outlined'
                       size='small'
-                      placeholder='Ingrese el código CIIU'
+                      placeholder='Código CIIU'
                       value={formData.codigoCiiu}
-                      onChange={handleChange('codigoCiiu')}
+                      disabled
                       sx={styles.textField}
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth variant='outlined' size='small' sx={styles.textField}>
-                      <InputLabel>Giros</InputLabel>
-                      <Select label='Giros' value={formData.giro} onChange={handleChange('giro')}>
-                        <MenuItem value=''>Seleccione el giro correspondiente</MenuItem>
-                        <MenuItem value='restaurante'>Restaurante</MenuItem>
-                        <MenuItem value='tienda'>Tienda</MenuItem>
-                        <MenuItem value='oficina'>Oficina</MenuItem>
-                        <MenuItem value='otro'>Otro</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Segunda fila: Actividad y Zonificación */}
+                  {/* Actividad */}
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -153,6 +252,7 @@ export const EstablecimientoPage = () => {
                     />
                   </Grid>
 
+                  {/* Zonificación (rellenado automático si existe) */}
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
@@ -170,7 +270,7 @@ export const EstablecimientoPage = () => {
               </Box>
             </Grid>
 
-            {/* Dirección Section */}
+            {/* Sección de Dirección */}
             <Grid item xs={12}>
               <Box sx={styles.sectionContainer}>
                 <Typography variant='subtitle1' sx={styles.sectionTitle}>
@@ -280,7 +380,11 @@ export const EstablecimientoPage = () => {
                   <Grid item xs={12} sm={6}>
                     <FormControl fullWidth variant='outlined' sx={styles.textField} size='small'>
                       <InputLabel>Provincia</InputLabel>
-                      <Select label='Provincia' value={formData.provincia} onChange={handleChange('provincia')}>
+                      <Select
+                        label='Provincia'
+                        value={formData.provincia}
+                        onChange={handleChange('provincia')}
+                      >
                         <MenuItem value=''>Seleccione una provincia</MenuItem>
                         <MenuItem value='Santa'>Santa</MenuItem>
                       </Select>
@@ -291,6 +395,8 @@ export const EstablecimientoPage = () => {
             </Grid>
           </Grid>
         </Box>
+
+        {/* Navegación del formulario */}
         <Box sx={styles.navigationWrapper}>
           <FormNavigation currentStepIndex={currentStepIndex} isValid={isValid} />
         </Box>
@@ -303,12 +409,13 @@ const styles = {
   formContainer: {
     p: 1,
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
+    overflowY: 'auto',
+  },
+  scrollArea: {
     overflowY: 'auto',
   },
   sectionContainer: {
-    mb: 3,
+    mb: 1,
     '&:last-child': {
       mb: 0,
     },
@@ -323,12 +430,6 @@ const styles = {
     '& .MuiOutlinedInput-root': {
       borderRadius: '8px',
       backgroundColor: '#fff',
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#90cdf4',
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#3182ce',
-      },
     },
     '& .MuiInputLabel-root': {
       color: '#4a5568',

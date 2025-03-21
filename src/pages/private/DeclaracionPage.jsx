@@ -1,5 +1,12 @@
-import { useState } from 'react';
-import { Grid, Box, Typography, FormControlLabel, Checkbox } from '@mui/material';
+import { useState, useEffect } from 'react';
+import {
+  Grid,
+  Box,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+  Button
+} from '@mui/material';
 import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
@@ -7,30 +14,104 @@ import { useFormStorage } from '../../storage/formStorage';
 
 export const DeclaracionPage = () => {
   const { currentStepIndex } = useFormNavigation();
-  const declaracionData = useFormStorage((state) => state.declaracionData);
   const updateDeclaracionData = useFormStorage((state) => state.updateDeclaracionData);
 
-  const [declarations, setDeclarations] = useState({
-    legalRepresentative: false,
-    safetyCompliance: false,
-    professionalTitle: false,
-  });
+  // Estado para almacenar los puntos de declaración obtenidos del backend
+  const [puntos, setPuntos] = useState([]);
+  // Estado para almacenar qué checkboxes están marcados: clave = puntoDeclaracionId, valor = boolean
+  const [selectedPoints, setSelectedPoints] = useState({});
 
-  const handleCheckboxChange = (key) => {
-    const newDeclarations = {
-      ...declarations,
-      [key]: !declarations[key],
+  // Cargar los puntos de declaración desde el endpoint al montar el componente
+  useEffect(() => {
+    const fetchPuntos = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/authentication/all/puntodeclaracion');
+        if (!response.ok) {
+          throw new Error('Error al obtener puntos de declaración');
+        }
+        const result = await response.json();
+        const data = result.data || [];
+        // Ordenar los puntos por "numeroPunto" para asegurar el orden
+        const sorted = data.sort((a, b) => a.numeroPunto - b.numeroPunto);
+        setPuntos(sorted);
+      } catch (error) {
+        console.error('Error fetchPuntos:', error);
+      }
     };
-    setDeclarations(newDeclarations);
-    const puntosDeclaracion = [];
-    if (newDeclarations.legalRepresentative) puntosDeclaracion.push(1);
-    if (newDeclarations.safetyCompliance) puntosDeclaracion.push(2);
-    if (newDeclarations.professionalTitle) puntosDeclaracion.push(3);
-    updateDeclaracionData({ puntosDeclaracion });
+    fetchPuntos();
+  }, []);
+
+  // Actualizar el store global cada vez que cambie selectedPoints
+  useEffect(() => {
+    const seleccionados = Object.entries(selectedPoints)
+      .filter(([id, checked]) => checked)
+      .map(([id]) => parseInt(id));
+    updateDeclaracionData({ puntosDeclaracion: seleccionados });
+  }, [selectedPoints, updateDeclaracionData]);
+
+  // Manejar el cambio de cada checkbox
+  const handleCheckboxChange = (puntoId) => {
+    setSelectedPoints((prev) => ({
+      ...prev,
+      [puntoId]: !prev[puntoId],
+    }));
   };
 
-  // Se considera válido si se han seleccionado al menos los dos primeros puntos
-  const isValid = declarations.legalRepresentative && declarations.safetyCompliance;
+  // Función para deshabilitar los checkboxes según el orden:
+  // - El primer punto (numeroPunto = 1) siempre habilitado.
+  // - El segundo (numeroPunto = 2) se habilita solo si el punto con id 1 está marcado.
+  // - El tercer (numeroPunto = 3) se habilita solo si el punto con id 2 está marcado.
+  const isDisabled = (numeroPunto) => {
+    if (numeroPunto === 1) return false;
+    if (numeroPunto === 2) return !selectedPoints[1];
+    if (numeroPunto === 3) return !selectedPoints[2];
+    return false;
+  };
+
+  // Verificar que se hayan marcado los puntos obligatorios (los que tienen obligatorio === true)
+  const requiredPoints = puntos.filter((p) => p.obligatorio === true);
+  const allRequiredSelected = requiredPoints.every(
+    (p) => selectedPoints[p.puntoDeclaracionId]
+  );
+  const isValid = allRequiredSelected;
+
+  // Función para enviar la declaración jurada al endpoint
+  const handleEnviarDeclaracionJurada = async () => {
+    try {
+      // Obtenemos los IDs de los puntos seleccionados
+      const puntoDeclaracionIds = Object.entries(selectedPoints)
+        .filter(([id, checked]) => checked)
+        .map(([id]) => parseInt(id));
+
+      const payload = {
+        estado: "SOLUCIONADO",
+        puntoDeclaracionIds,
+      };
+
+      console.log('Enviando declaración jurada:', payload);
+
+      const response = await fetch('http://localhost:8080/api/v1/authentication/create/declaracion-jurada', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error al enviar declaración jurada:', errorText);
+        throw new Error('Error en el envío de la declaración jurada');
+      }
+
+      const result = await response.json();
+      console.log('Declaración jurada enviada exitosamente:', result);
+      alert('Declaración jurada enviada exitosamente');
+    } catch (error) {
+      console.error('Error en enviar declaración jurada:', error);
+      alert('Error en enviar declaración jurada');
+    }
+  };
 
   return (
     <FormLayout
@@ -46,65 +127,38 @@ export const DeclaracionPage = () => {
                 <Typography variant='subtitle1' sx={styles.sectionTitle}>
                   Declaraciones
                 </Typography>
-
-                <Box sx={styles.declarationContainer}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={declarations.legalRepresentative}
-                        onChange={() => handleCheckboxChange('legalRepresentative')}
+                {puntos.map((punto) => {
+                  const id = punto.puntoDeclaracionId;
+                  const isChecked = !!selectedPoints[id];
+                  return (
+                    <Box key={id} sx={styles.declarationContainer}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={isChecked}
+                            disabled={isDisabled(punto.numeroPunto)}
+                            onChange={() => handleCheckboxChange(id)}
+                          />
+                        }
+                        label={
+                          <Typography variant='body2' sx={styles.declarationText}>
+                            {punto.descripcion}
+                          </Typography>
+                        }
                       />
-                    }
-                    label={
-                      <Typography variant='body2' sx={styles.declarationText}>
-                        Cuento con poder suficiente vigente para actuar como representante legal de la persona
-                        jurídica conductora (alternativamente, de la persona natural que represento).
-                      </Typography>
-                    }
-                  />
-                </Box>
-
-                <Box sx={styles.declarationContainer}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={declarations.safetyCompliance}
-                        onChange={() => handleCheckboxChange('safetyCompliance')}
-                      />
-                    }
-                    label={
-                      <Typography variant='body2' sx={styles.declarationText}>
-                        El establecimiento cumple con las condiciones de seguridad en edificaciones y me someto a
-                        la inspección técnica que corresponda en función al nivel de riesgo, de conformidad con la
-                        legislación aplicable.
-                      </Typography>
-                    }
-                  />
-                </Box>
-
-                <Box sx={styles.declarationContainer}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={declarations.professionalTitle}
-                        onChange={() => handleCheckboxChange('professionalTitle')}
-                      />
-                    }
-                    label={
-                      <Typography variant='body2' sx={styles.declarationText}>
-                        Cuento con título profesional vigente y estoy habilitado por el colegio profesional
-                        correspondiente (en el caso de servicios relacionados con la salud).
-                      </Typography>
-                    }
-                  />
-                </Box>
+                    </Box>
+                  );
+                })}
               </Box>
             </Grid>
           </Grid>
         </Box>
-
         <Box sx={styles.navigationWrapper}>
-          <FormNavigation currentStepIndex={currentStepIndex} nextButtonText='Finalizar' isValid={isValid} />
+          <FormNavigation
+            currentStepIndex={currentStepIndex}
+            nextButtonText='Finalizar'
+            isValid={isValid}
+          />
         </Box>
       </Box>
     </FormLayout>
@@ -157,21 +211,8 @@ const styles = {
   declarationText: {
     color: '#475569',
   },
-  textField: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '8px',
-      backgroundColor: '#fff',
-      '&:hover .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#90cdf4',
-      },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-        borderColor: '#3182ce',
-      },
-    },
-    '& .MuiInputLabel-root': {
-      color: '#4a5568',
-    },
-  },
 };
+
+
 
 export default DeclaracionPage;

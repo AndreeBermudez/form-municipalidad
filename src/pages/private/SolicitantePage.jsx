@@ -9,12 +9,12 @@ import {
   Box,
   Typography,
   InputAdornment,
+  Button, 
 } from '@mui/material';
 import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
 import { FormNavigation } from '../../features/licencia/components/navigation/FormNavigation';
 import { useFormStorage } from '../../storage/formStorage';
-
 
 import {
   validateDNI,
@@ -25,7 +25,6 @@ import {
   validateTelefono,
 } from '../../features/licencia/components/utils/validations';
 
-
 import { fetchProvincias, fetchDistritos } from '../../features/licencia/components/data/ApiUbigeo';
 
 export const SolicitantePage = () => {
@@ -33,36 +32,83 @@ export const SolicitantePage = () => {
   const updateSolicitanteData = useFormStorage((state) => state.updateSolicitanteData);
   const solicitanteData = useFormStorage((state) => state.solicitanteData);
 
-
+  // El tipo de contribuyente; por defecto "natural"
   const [selectedType] = useState(solicitanteData.contributorType || 'natural');
 
-  const [formData, setFormData] = useState({
-    ruc: '',
-    nombre: '',
-    razonSocial: '',
-    documentType: '',
-    documentNumber: '',
-    email: '',
-    telefono: '',
-    tipoDireccionNum: '',
-    direccionNum: '',
-    tipoDireccion: '',
-    direccionNombre: '',
-    tipoUrbanizacion: '',
-    urbanizacionNombre: '',
-    distrito: '',
-    provincia: '',
+  // Valores base obtenidos, por ejemplo, en el login
+  const storedNombre = localStorage.getItem('nombre') || '';
+  const storedApellido = localStorage.getItem('apellido') || '';
+  const storedDocumentType = localStorage.getItem('documentType') || 'DNI';
+  const nombreCompleto = `${storedApellido} ${storedNombre}`.trim();
+
+  // Objeto inicial del formulario
+  const initialFormData = {
     ...solicitanteData,
-  });
+    ruc: solicitanteData.ruc || '',
+    nombre: solicitanteData.nombre || nombreCompleto,
+    razonSocial: solicitanteData.razonSocial || '',
+    documentType: solicitanteData.documentType || storedDocumentType,
+    // Si es natural, se carga el dni desde localStorage; si es jurídica, se deja vacío o lo que tenga en solicitanteData
+    documentNumber:
+      selectedType === 'natural'
+        ? solicitanteData.documentNumber || localStorage.getItem('dni') || ''
+        : solicitanteData.documentNumber || '',
+    email: solicitanteData.email || localStorage.getItem('correo') || '',
+    telefono: solicitanteData.telefono || localStorage.getItem('telefono') || '',
+    tipoDireccionNum: solicitanteData.tipoDireccionNum || '',
+    direccionNum: solicitanteData.direccionNum || '',
+    tipoDireccion: solicitanteData.tipoDireccion || '',
+    direccionNombre: solicitanteData.direccionNombre || '',
+    tipoUrbanizacion: solicitanteData.tipoUrbanizacion || '',
+    urbanizacionNombre: solicitanteData.urbanizacionNombre || '',
+    distrito: solicitanteData.distrito || '',
+    provincia: solicitanteData.provincia || '',
+    // Campos que se obtendrán de la consulta RUC
+    tipoDocumento: solicitanteData.tipoDocumento || '',
+    actividadEconomica: solicitanteData.actividadEconomica || '',
+    condicionContribuyente: solicitanteData.condicionContribuyente || '',
+    estadoRuc: solicitanteData.estadoRuc || '',
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
 
+  // Sincronizar el estado local con el store cuando éste cambie
+  useEffect(() => {
+    setFormData({
+      ...solicitanteData,
+      ruc: solicitanteData.ruc || '',
+      nombre: solicitanteData.nombre || nombreCompleto,
+      razonSocial: solicitanteData.razonSocial || '',
+      documentType: solicitanteData.documentType || storedDocumentType,
+      documentNumber:
+        selectedType === 'natural'
+          ? solicitanteData.documentNumber || localStorage.getItem('dni') || ''
+          : solicitanteData.documentNumber || '',
+      email: solicitanteData.email || localStorage.getItem('correo') || '',
+      telefono: solicitanteData.telefono || localStorage.getItem('telefono') || '',
+      tipoDireccionNum: solicitanteData.tipoDireccionNum || '',
+      direccionNum: solicitanteData.direccionNum || '',
+      tipoDireccion: solicitanteData.tipoDireccion || '',
+      direccionNombre: solicitanteData.direccionNombre || '',
+      tipoUrbanizacion: solicitanteData.tipoUrbanizacion || '',
+      urbanizacionNombre: solicitanteData.urbanizacionNombre || '',
+      distrito: solicitanteData.distrito || '',
+      provincia: solicitanteData.provincia || '',
+      tipoDocumento: solicitanteData.tipoDocumento || '',
+      actividadEconomica: solicitanteData.actividadEconomica || '',
+      condicionContribuyente: solicitanteData.condicionContribuyente || '',
+      estadoRuc: solicitanteData.estadoRuc || '',
+    });
+  }, [solicitanteData, nombreCompleto, storedDocumentType, selectedType]);
+
+  // Estados para provincias/distritos
   const [provincias, setProvincias] = useState([]);
   const [distritos, setDistritos] = useState([]);
   const [selectedProvincia, setSelectedProvincia] = useState(formData.provincia || '');
   const [selectedDistrito, setSelectedDistrito] = useState(formData.distrito || '');
   const [filteredDistritos, setFilteredDistritos] = useState([]);
 
-
+  // Estados de errores
   const [dniError, setDniError] = useState("");
   const [nameError, setNameError] = useState("");
   const [rucError, setRucError] = useState("");
@@ -74,7 +120,6 @@ export const SolicitantePage = () => {
     fetchDistritos().then(setDistritos);
   }, []);
 
-
   useEffect(() => {
     if (selectedProvincia) {
       const provinciaId = provincias.find(prov => prov.provincia === selectedProvincia)?.id;
@@ -83,7 +128,6 @@ export const SolicitantePage = () => {
       setFilteredDistritos([]);
     }
   }, [selectedProvincia, provincias, distritos]);
-
 
   const handleChange = (field) => (event) => {
     const newValue = event.target.value;
@@ -106,7 +150,6 @@ export const SolicitantePage = () => {
     updateSolicitanteData({ distrito: value });
   };
 
-
   const handleDocumentNumberChange = (event) => {
     const newValue = event.target.value;
     setFormData((prev) => ({ ...prev, documentNumber: newValue }));
@@ -128,11 +171,50 @@ export const SolicitantePage = () => {
     setNameError(validateName(newValue));
   };
 
-  const handleRucChange = (event) => {
+  // Consulta automática a la API de SUNAT al ingresar el RUC
+  const handleRucChange = async (event) => {
     const newValue = event.target.value;
     setFormData((prev) => ({ ...prev, ruc: newValue }));
     updateSolicitanteData({ ruc: newValue });
     setRucError(validateRUC(newValue));
+
+    if (newValue.length === 11) {
+      try {
+        const response = await fetch(`http://localhost:8080/api/v1/authentication/empresa/${newValue}`, {
+          method: 'POST',
+        });
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data) {
+            const empresa = result.data;
+            setFormData((prev) => ({
+              ...prev,
+              razonSocial: empresa.razonSocial,
+              tipoDocumento: empresa.tipoDocumento,
+              actividadEconomica: empresa.actividadEconomica,
+              condicionContribuyente: empresa.condicion,
+              estadoRuc: empresa.estado,
+            }));
+            updateSolicitanteData({
+              razonSocial: empresa.razonSocial,
+              tipoDocumento: empresa.tipoDocumento,
+              actividadEconomica: empresa.actividadEconomica,
+              condicionContribuyente: empresa.condicion,
+              estadoRuc: empresa.estado,
+            });
+            localStorage.setItem('razonSocial', empresa.razonSocial);
+            localStorage.setItem('tipoDocumento', empresa.tipoDocumento);
+            localStorage.setItem('actividadEconomica', empresa.actividadEconomica);
+            localStorage.setItem('condicionContribuyente', empresa.condicion);
+            localStorage.setItem('estadoRuc', empresa.estado);
+          }
+        } else {
+          console.error('Error consultando datos de la empresa:', await response.text());
+        }
+      } catch (error) {
+        console.error('Error en fetch de empresa:', error);
+      }
+    }
   };
 
   const handleEmailChange = (event) => {
@@ -149,7 +231,6 @@ export const SolicitantePage = () => {
     updateSolicitanteData({ telefono: newValue });
     setTelefonoError(validateTelefono(newValue));
   };
-
 
   let requiredFields = [
     'email',
@@ -187,6 +268,52 @@ export const SolicitantePage = () => {
           ? formData.documentNumber.length >= 8 && formData.documentNumber.length <= 12
           : false);
 
+  // Botón para crear el tipo de contribuyente usando solo los datos requeridos
+  const handleCrearTipoContribuyente = async () => {
+    try {
+      const payload = {
+        actividadEconomica: solicitanteData.actividadEconomica || formData.actividadEconomica,
+        condicionContribuyente: solicitanteData.condicionContribuyente || formData.condicionContribuyente,
+        estadoRuc: solicitanteData.estadoRuc || formData.estadoRuc,
+        nombreRazonSocial: solicitanteData.razonSocial || formData.razonSocial,
+        numeroDocumento: solicitanteData.ruc || formData.ruc,
+        tipoDocumento: solicitanteData.tipoDocumento || formData.tipoDocumento,
+      };
+  
+      console.log('Enviando tipoContribuyente:', payload);
+  
+      const response = await fetch('http://localhost:8080/api/v1/authentication/create/tipoContribuyente', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error al crear tipoContribuyente:', errorText);
+        throw new Error('No se pudo crear el tipoContribuyente');
+      }
+  
+      const result = await response.json();
+      console.log('Creación exitosa:', result);
+      
+      // Captura el tipoContribuyenteId desde la respuesta.
+      const tipoContribuyenteId = result.data?.tipoContribuyenteId || result.data?.id;
+      if (tipoContribuyenteId) {
+        localStorage.setItem('tipoContribuyenteId', tipoContribuyenteId);
+      } else {
+        console.error('No se encontró el tipoContribuyenteId en la respuesta.');
+      }
+      
+      alert('Tipo de Contribuyente creado con éxito');
+    } catch (error) {
+      console.error('Error al crear el tipo de contribuyente:', error);
+      alert('Ocurrió un error al crear el tipo de contribuyente');
+    }
+  };
+  
   return (
     <FormLayout
       headerTitle="Trámite de Licencia"
@@ -195,7 +322,6 @@ export const SolicitantePage = () => {
     >
       <Box sx={styles.formContainer}>
         <Grid container spacing={1}>
-        
           <Grid item xs={12}>
             <Box sx={styles.sectionContainer}>
               <Typography variant="subtitle1" sx={styles.sectionTitle}>
@@ -223,7 +349,6 @@ export const SolicitantePage = () => {
                         onChange={handleChange('documentType')}
                         disabled={selectedType === 'juridica'}
                         sx={styles.documentTypeSelect}
-                        defaultValue=""
                         size="small"
                       >
                         <MenuItem value="">↓</MenuItem>
@@ -237,7 +362,6 @@ export const SolicitantePage = () => {
             </Box>
           </Grid>
 
-          
           <Grid item xs={12}>
             <Box sx={styles.sectionContainer}>
               <Typography variant="subtitle1" sx={styles.sectionTitle}>
@@ -271,8 +395,6 @@ export const SolicitantePage = () => {
                     />
                   )}
                 </Grid>
-
-           
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -288,7 +410,6 @@ export const SolicitantePage = () => {
                     inputProps={{ maxLength: 11 }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -304,7 +425,6 @@ export const SolicitantePage = () => {
                     helperText={emailError}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -324,7 +444,6 @@ export const SolicitantePage = () => {
             </Box>
           </Grid>
 
-        
           <Grid item xs={12}>
             <Box sx={styles.sectionContainer}>
               <Typography variant="subtitle1" sx={styles.sectionTitle}>
@@ -349,7 +468,6 @@ export const SolicitantePage = () => {
                             value={formData.tipoDireccionNum || ''}
                             onChange={handleChange('tipoDireccionNum')}
                             sx={styles.documentTypeSelect}
-                            defaultValue=""
                             size="small"
                           >
                             <MenuItem value="">↓</MenuItem>
@@ -362,7 +480,6 @@ export const SolicitantePage = () => {
                     }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -381,7 +498,6 @@ export const SolicitantePage = () => {
                             value={formData.tipoDireccion || ''}
                             onChange={handleChange('tipoDireccion')}
                             sx={styles.documentTypeSelect}
-                            defaultValue=""
                             size="small"
                           >
                             <MenuItem value="">↓</MenuItem>
@@ -396,7 +512,6 @@ export const SolicitantePage = () => {
                     }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -415,7 +530,6 @@ export const SolicitantePage = () => {
                             value={formData.tipoUrbanizacion || ''}
                             onChange={handleChange('tipoUrbanizacion')}
                             sx={styles.documentTypeSelect}
-                            defaultValue=""
                             size="small"
                           >
                             <MenuItem value="">↓</MenuItem>
@@ -428,7 +542,6 @@ export const SolicitantePage = () => {
                     }}
                   />
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth variant="outlined" sx={styles.textField} size="small">
                     <InputLabel>Provincia</InputLabel>
@@ -438,7 +551,7 @@ export const SolicitantePage = () => {
                       onChange={handleProvinciaChange}
                     >
                       <MenuItem value="">Seleccione una provincia</MenuItem>
-                      {provincias.map(provincia => (
+                      {provincias.map((provincia) => (
                         <MenuItem key={provincia.id} value={provincia.provincia}>
                           {provincia.provincia}
                         </MenuItem>
@@ -446,7 +559,6 @@ export const SolicitantePage = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-    
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth variant="outlined" sx={styles.textField} size="small">
                     <InputLabel>Distrito</InputLabel>
@@ -456,7 +568,7 @@ export const SolicitantePage = () => {
                       onChange={handleDistritoChange}
                     >
                       <MenuItem value="">Seleccione un distrito</MenuItem>
-                      {filteredDistritos.map(distrito => (
+                      {filteredDistritos.map((distrito) => (
                         <MenuItem key={distrito.id} value={distrito.distrito}>
                           {distrito.distrito}
                         </MenuItem>
@@ -468,9 +580,9 @@ export const SolicitantePage = () => {
             </Box>
           </Grid>
         </Grid>
-   
+
         <FormNavigation currentStepIndex={currentStepIndex} isValid={isFormValid} />
-      </Box>
+        </Box>
     </FormLayout>
   );
 };

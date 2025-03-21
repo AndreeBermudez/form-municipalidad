@@ -7,6 +7,7 @@ import {
 	Box,
 	Typography,
 	InputAdornment,
+	Button,
 } from '@mui/material';
 import { FormLayout } from '../../layout/FormLayout';
 import { useFormNavigation } from '../../features/licencia/hooks/useFormNavigation';
@@ -24,7 +25,8 @@ export const RepresentantePage = () => {
 	const { currentStepIndex } = useFormNavigation();
 	const updateRepresentanteData = useFormStorage((state) => state.updateRepresentanteData);
 	const representanteData = useFormStorage((state) => state.representanteData);
-
+	// Se obtiene también la data del solicitante (almacenada globalmente)
+	const solicitanteData = useFormStorage((state) => state.solicitanteData);
 
 	const [formData, setFormData] = useState({
 		nombreCompleto: '',
@@ -71,7 +73,6 @@ export const RepresentantePage = () => {
 		setNameError(errorMsg);
 	};
 
-
 	const requiredFields = [
 		"nombreCompleto",
 		"documentType",
@@ -87,6 +88,48 @@ export const RepresentantePage = () => {
 		nameError === "" &&
 		documentError === "" &&
 		partidaError === "";
+
+	// Función para guardar el tipo de contribuyente desde la página de representante legal
+	const handleGuardarTipoContribuyenteRepresentante = async () => {
+		try {
+			// Se construye el payload combinando datos del solicitante y del representante legal
+			const payload = {
+				actividadEconomica: solicitanteData.actividadEconomica || "",
+				condicionContribuyente: solicitanteData.condicionContribuyente || "",
+				estadoRuc: solicitanteData.estadoRuc || "",
+				nombreRazonSocial: solicitanteData.razonSocial || "",
+				numeroDocumento: solicitanteData.ruc || "",
+				tipoDocumento: solicitanteData.tipoDocumento || formData.tipoDocumento,
+				representanteLegal: formData.nombreCompleto,
+				asientoRepresentanteLegal: formData.asientoInscripcion,
+				dniRepresentanteLegal: formData.documentNumber,
+				numPartidaRepresentanteLegal: formData.partidaElectronica,
+			};
+      
+			console.log("Enviando tipoContribuyente desde Representante:", payload);
+      
+			const response = await fetch("http://localhost:8080/api/v1/authentication/create/tipoContribuyente", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(payload)
+			});
+      
+			if (!response.ok) {
+				const errorText = await response.text();
+				console.error("Error al crear tipoContribuyente:", errorText);
+				throw new Error("No se pudo crear el tipoContribuyente");
+			}
+      
+			const result = await response.json();
+			console.log("Creación exitosa desde Representante:", result);
+			alert("Tipo de Contribuyente creado con éxito");
+		} catch (error) {
+			console.error("Error en guardarTipoContribuyente desde Representante:", error);
+			alert("Error al guardar el tipo de contribuyente");
+		}
+	};
 
 	return (
 		<FormLayout
@@ -191,6 +234,7 @@ export const RepresentantePage = () => {
 						</Box>
 					</Grid>
 				</Grid>
+				
 				<Box sx={styles.navigationWrapper}>
 					{/* Se pasa isValid para habilitar el botón "Continuar" */}
 					<FormNavigation currentStepIndex={currentStepIndex} isValid={isValid} />
@@ -246,8 +290,11 @@ const styles = {
 		},
 	},
 	navigationWrapper: {
-		marginTop: "auto",
-		paddingTop: 4,
+		mt: "auto",
+		pt: 2,
+		pb: 1,
+		px: 1,
+		backgroundColor: "white",
 	},
 };
 
